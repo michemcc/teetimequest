@@ -1,0 +1,130 @@
+/* ─── TeeTimeQuest — Design System ──────────────────────────────────────────── */
+
+:root {
+  /* Brand */
+  --lime-50:  #f4ffe8;
+  --lime-100: #e4ffc4;
+  --lime-200: #c9ff88;
+  --lime-300: #a8f043;
+  --lime-400: #8ddd1a;
+  --lime-500: #6db800;
+  --lime-600: #4f8a00;
+  --lime-700: #3a6600;
+
+  --ink-50:   #f7f7f5;
+  --ink-100:  #eeecea;
+  --ink-200:  #d8d5d0;
+  --ink-300:  #b5b0a8;
+  --ink-400:  #8c8680;
+  --ink-500:  #625d57;
+  --ink-600:  #403c37;
+  --ink-700:  #272420;
+  --ink-800:  #181612;
+  --ink-900:  #0e0c09;
+
+  /* Light mode tokens */
+  --bg-base:      #f7f7f5;
+  --bg-surface:   #ffffff;
+  --bg-raised:    #ffffff;
+  --bg-overlay:   #f0eeeb;
+  --text-primary: #181612;
+  --text-secondary:#625d57;
+  --text-muted:   #8c8680;
+  --text-invert:  #ffffff;
+  --border:       rgba(24,22,18,0.10);
+  --border-strong:rgba(24,22,18,0.18);
+  --accent:       #8ddd1a;
+  --accent-text:  #3a6600;
+  --accent-hover: #a8f043;
+
+  /* Sizing */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius-full: 999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,0.09);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.11);
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 120ms;
+  --t-base: 200ms;
+  --t-slow: 340ms;
+
+  /* Typography */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ─── Dark mode ──────────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg-base:      #0e0c09;
+  --bg-surface:   #181612;
+  --bg-raised:    #1f1d18;
+  --bg-overlay:   #272420;
+  --text-primary: #f0eeeb;
+  --text-secondary:#b5b0a8;
+  --text-muted:   #625d57;
+  --text-invert:  #0e0c09;
+  --border:       rgba(240,238,235,0.08);
+  --border-strong:rgba(240,238,235,0.14);
+  --accent:       #a8f043;
+  --accent-text:  #3a6600;
+  --accent-hover: #c9ff88;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.30);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
+  --shadow-md: 0 6px 24px rgba(0,0,0,0.40);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.50);
+}
+
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  transition: background var(--t-slow) var(--ease), color var(--t-slow) var(--ease);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: var(--font-body); border: none; background: none; }
+input, select, textarea { font-family: var(--font-body); }
+img { max-width: 100%; }
+
+/* ─── Layout utilities ───────────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.container--narrow { max-width: 700px; }
+.container--xs { max-width: 520px; }
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }

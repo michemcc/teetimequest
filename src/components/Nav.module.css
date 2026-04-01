@@ -1,0 +1,145 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: background var(--t-slow) var(--ease), border-color var(--t-slow) var(--ease);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  gap: 1rem;
+}
+
+/* ─── Logo ─────────────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoMark {
+  padding: 0 8px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.logoText {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+/* ─── Actions ──────────────────────────────────────────── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Coffee button ────────────────────────────────────── */
+.coffeeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--bg-base);
+  text-decoration: none;
+  transition: all var(--t-base) var(--ease);
+  white-space: nowrap;
+}
+
+.coffeeBtn:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background: var(--bg-overlay);
+}
+
+.coffeeIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.coffeeLabelShort { display: none; }
+
+@media (max-width: 600px) {
+  .coffeeLabelFull { display: none; }
+  .coffeeLabelShort { display: inline; }
+}
+
+@media (max-width: 420px) {
+  .coffeeBtn span:not(.coffeeIcon) { display: none; }
+  .coffeeBtn { padding: 7px 9px; }
+}
+
+/* ─── Theme toggle ─────────────────────────────────────── */
+.themeToggle {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  background: var(--bg-base);
+  transition: all var(--t-base) var(--ease);
+  flex-shrink: 0;
+}
+
+.themeToggle:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  background: var(--bg-overlay);
+}
+
+/* ─── CTA ──────────────────────────────────────────────── */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: background var(--t-base) var(--ease), transform var(--t-fast) var(--ease);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.cta:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 380px) {
+  .cta { padding: 8px 14px; font-size: 0.8rem; }
+}
