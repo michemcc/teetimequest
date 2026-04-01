@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
+import Footer from '../components/Footer'
 import styles from './NotFoundPage.module.css'
 
 export default function NotFoundPage() {
@@ -17,6 +18,7 @@ export default function NotFoundPage() {
           </Link>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

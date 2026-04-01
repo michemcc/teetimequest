@@ -1,0 +1,168 @@
+.page { min-height: 100vh; background: var(--bg-base); display: flex; flex-direction: column; }
+
+.content { padding: 3.5rem 1.25rem 4rem; flex: 1; }
+
+/* ─── Hero ───────────────────────────────────────────── */
+.hero { margin-bottom: 2.5rem; }
+
+.chip {
+  display: inline-block;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent-text); background: color-mix(in srgb, var(--accent) 14%, transparent);
+  padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: 1rem;
+}
+[data-theme="dark"] .chip { color: var(--accent); }
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800;
+  color: var(--text-primary); letter-spacing: -0.04em; line-height: 1.05;
+  margin-bottom: 1rem;
+}
+
+.lead {
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  color: var(--text-secondary); font-weight: 300; line-height: 1.7;
+  max-width: 560px;
+}
+
+.lastUpdated {
+  font-size: 0.78rem; color: var(--text-muted); margin-top: 0.75rem;
+}
+
+/* ─── About grid ─────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+@media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--bg-surface);
+  padding: 1.75rem;
+  transition: background var(--t-base) var(--ease);
+}
+.card:hover { background: var(--bg-overlay); }
+
+.cardIcon { font-size: 1.5rem; display: block; margin-bottom: 0.75rem; line-height: 1; }
+.cardTitle {
+  font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+  color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.6rem;
+}
+.cardText { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.65; }
+
+.inlineLink {
+  color: var(--accent-text); font-weight: 500;
+  text-decoration: underline; text-underline-offset: 3px;
+  transition: color var(--t-base) var(--ease);
+}
+[data-theme="dark"] .inlineLink { color: var(--accent); }
+.inlineLink:hover { color: var(--text-primary); }
+
+/* ─── About CTA ──────────────────────────────────────── */
+.cta {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.5rem 1.75rem;
+}
+.ctaText { font-size: 0.95rem; color: var(--text-secondary); }
+.ctaBtn {
+  display: inline-flex; align-items: center;
+  background: var(--accent); color: var(--accent-text);
+  font-size: 0.88rem; font-weight: 600; padding: 10px 20px;
+  border-radius: var(--radius-full); text-decoration: none;
+  transition: background var(--t-base) var(--ease);
+  white-space: nowrap;
+}
+.ctaBtn:hover { background: var(--accent-hover); }
+
+/* ─── Contact form ───────────────────────────────────── */
+.form { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 480px) { .formGrid { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.label { font-size: 0.78rem; font-weight: 500; color: var(--text-secondary); }
+
+.input {
+  height: 44px; padding: 0 13px;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  font-size: 0.9rem; color: var(--text-primary); background: var(--bg-surface);
+  outline: none; transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+}
+.input::placeholder { color: var(--text-muted); }
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.textarea {
+  padding: 11px 13px; resize: vertical;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  font-size: 0.9rem; color: var(--text-primary); background: var(--bg-surface);
+  outline: none; transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  line-height: 1.6; font-family: var(--font-body);
+}
+.textarea::placeholder { color: var(--text-muted); }
+.textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.submitBtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--accent); color: var(--accent-text);
+  font-size: 0.92rem; font-weight: 600; padding: 14px 24px;
+  border-radius: var(--radius-full); transition: background var(--t-base) var(--ease), transform var(--t-fast) var(--ease);
+  align-self: flex-start;
+}
+.submitBtn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+/* ─── Contact success ────────────────────────────────── */
+.successCard {
+  display: flex; gap: 1rem; align-items: flex-start;
+  background: var(--bg-surface); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;
+}
+.successIcon {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-text);
+  font-size: 0.9rem; font-weight: 700; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.successTitle { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; margin-bottom: 3px; }
+.successDesc { font-size: 0.83rem; color: var(--text-secondary); }
+
+/* ─── Alt contact ────────────────────────────────────── */
+.altContact {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.83rem; color: var(--text-muted); flex-wrap: wrap;
+}
+.altContactText { color: var(--text-muted); }
+
+/* ─── Privacy ────────────────────────────────────────── */
+.policyList {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;
+}
+
+.policySection {
+  padding: 1.5rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  transition: background var(--t-base) var(--ease);
+}
+.policySection:last-child { border-bottom: none; }
+.policySection:hover { background: var(--bg-overlay); }
+
+.policySectionTitle {
+  font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
+  color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.6rem;
+}
+.policySectionBody { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }

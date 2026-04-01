@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
+import Footer from '../components/Footer'
 import { createRound } from '../utils/store'
 import styles from './CreateRoundPage.module.css'
 
@@ -111,6 +112,7 @@ export default function CreateRoundPage() {
           </button>
         </form>
       </div>
+      <Footer />
     </div>
   )
 }

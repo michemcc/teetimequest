@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
 import { getRound } from '../utils/store'
+import Footer from '../components/Footer'
 import { formatDateLong } from '../utils/dates'
 import styles from './ResultsPage.module.css'
 
@@ -239,6 +240,7 @@ export default function ResultsPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

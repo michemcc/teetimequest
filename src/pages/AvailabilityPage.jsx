@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
+import Footer from '../components/Footer'
 import { getRound, saveAvailability } from '../utils/store'
 import { getNextNDays, formatDate, groupByMonth } from '../utils/dates'
 import styles from './AvailabilityPage.module.css'
@@ -170,6 +171,7 @@ export default function AvailabilityPage() {
           </form>
         )}
       </div>
+      <Footer />
     </div>
   )
 }
