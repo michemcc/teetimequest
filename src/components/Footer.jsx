@@ -4,48 +4,49 @@ import styles from './Footer.module.css'
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={`container ${styles.inner}`}>
-        <div className={styles.brand}>
-          <Link to="/" className={styles.logo}>
-            <span className={styles.logoMark}>TTQ</span>
-            <span className={styles.logoText}>TeeTimeQuest</span>
-          </Link>
-          <p className={styles.tagline}>Golf scheduling, finally solved.</p>
-        </div>
 
-        <nav className={styles.links}>
-          <div className={styles.linkGroup}>
-            <p className={styles.linkGroupLabel}>Product</p>
-            <Link to="/create" className={styles.link}>Plan a round</Link>
-            <Link to="/#how" className={styles.link}>How it works</Link>
-          </div>
-          <div className={styles.linkGroup}>
-            <p className={styles.linkGroupLabel}>Company</p>
-            <Link to="/about" className={styles.link}>About</Link>
-            <Link to="/contact" className={styles.link}>Contact</Link>
-            <Link to="/privacy" className={styles.link}>Privacy</Link>
-          </div>
-          <div className={styles.linkGroup}>
-            <p className={styles.linkGroupLabel}>Support</p>
-            <a
-              href="https://buymeacoffee.com/michemcc"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.link}
-            >
+      {/* ── Main body ── */}
+      <div className={styles.body}>
+        <div className={`container ${styles.grid}`}>
+          <div className={styles.brand}>
+            <Link to="/" className={styles.brandLogo}>
+              <svg width="15" height="19" viewBox="0 0 20 24" fill="none">
+                <rect x="4" y="1" width="1.5" height="22" rx="0.75" fill="currentColor" opacity="0.7"/>
+                <path d="M5.5 2 L18 6.5 L5.5 12 Z" fill="var(--gold)"/>
+                <circle cx="5.5" cy="23" r="2.5" fill="currentColor" opacity="0.5"/>
+              </svg>
+              <span className={styles.brandName}>TeeTimeQuest</span>
+            </Link>
+            <p className={styles.brandTagline}>Golf scheduling,<br/>finally solved.</p>
+            <a href="https://buymeacoffee.com/michemcc" target="_blank" rel="noopener noreferrer" className={styles.coffeeLink}>
               ☕ Buy me a coffee
             </a>
           </div>
-        </nav>
-      </div>
-
-      <div className={`container ${styles.bottom}`}>
-        <p className={styles.copy}>© {new Date().getFullYear()} TeeTimeQuest. All rights reserved.</p>
-        <div className={styles.bottomLinks}>
-          <Link to="/privacy" className={styles.bottomLink}>Privacy</Link>
-          <Link to="/contact" className={styles.bottomLink}>Contact</Link>
+          <div className={styles.linkColumns}>
+            <div className={styles.col}>
+              <p className={styles.colLabel}>Product</p>
+              <Link to="/create" className={styles.colLink}>Plan a round</Link>
+              <a href="/#how" className={styles.colLink}>How it works</a>
+            </div>
+            <div className={styles.col}>
+              <p className={styles.colLabel}>Company</p>
+              <Link to="/about" className={styles.colLink}>About</Link>
+              <Link to="/contact" className={styles.colLink}>Contact</Link>
+              <Link to="/privacy" className={styles.colLink}>Privacy</Link>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* ── Bottom bar ── completely self-contained, no .container dependency ── */}
+      <div className={styles.bottom}>
+        <span className={styles.copy}>© {new Date().getFullYear()} TeeTimeQuest</span>
+        <span className={styles.dot}>·</span>
+        <Link to="/privacy" className={styles.bottomLink}>Privacy</Link>
+        <span className={styles.dot}>·</span>
+        <Link to="/contact" className={styles.bottomLink}>Contact</Link>
+      </div>
+
     </footer>
   )
 }

@@ -3,3 +3,8 @@ dist
 .env
 .env.local
 .DS_Store
+
+# Environment files
+.env.*.local
+# Keep the example file in git
+!.env.example
