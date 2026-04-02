@@ -9,7 +9,7 @@ import styles from './InfoPage.module.css'
  * Setup (one-time, 2 minutes):
  *  1. Go to https://formspree.io and sign up (free)
  *  2. Click "New Form" → give it a name → copy your Form ID (looks like "xpzvwqab")
- *  3. Replace YOUR_FORMSPREE_ID below with your actual ID
+ *  3. ✅ Done — ID is already set to 'mojpnkyn'
  *  4. Verify your email when Formspree sends you a confirmation
  *  Done — submissions land in your inbox and Formspree dashboard.
  *
@@ -36,7 +36,7 @@ export default function ContactPage() {
     if (!form.message.trim()) return setError('Please enter a message.')
 
     // If the Formspree ID hasn't been set yet, show a friendly dev note
-    if (FORMSPREE_ID === 'YOUR_FORMSPREE_ID') {
+    if (!FORMSPREE_ID || FORMSPREE_ID === 'YOUR_FORMSPREE_ID') {
       setError('Contact form not yet configured. See ContactPage.jsx for setup instructions.')
       return
     }

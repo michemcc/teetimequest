@@ -171,3 +171,9 @@
   animation: spin 0.7s linear infinite; flex-shrink: 0;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 420px) {
+  .card { padding: 1.25rem 1rem; border-radius: var(--radius-md); }
+  .pageInner { padding: 3.5rem 0.875rem 5rem; }
+  .row2 { grid-template-columns: 1fr; }
+}

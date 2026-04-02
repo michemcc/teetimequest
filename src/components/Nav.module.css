@@ -1,89 +1,101 @@
+/* ══════════════════════════════════════════════
+   Nav — contemporary, mobile-first
+   Desktop: logo | center links | actions
+   Tablet:  logo | actions (center links hidden)
+   Mobile:  logo | minimal actions
+══════════════════════════════════════════════ */
+
 .nav {
   position: sticky;
   top: 0;
   z-index: 200;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-strong);
-  transition: background var(--t-slow) var(--ease), border-color var(--t-slow) var(--ease);
+  transition: background var(--t-slow) var(--ease);
+  /* No overflow hidden — dropdown must show */
 }
 
-/* Subtle top rule in gold */
 .nav::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
   background: var(--gold);
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  height: 62px;
-  gap: 1rem;
+  height: 60px;
+  gap: 0.75rem;
+  padding: 0 1.5rem;
+  max-width: 1160px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* ─── Logo ─────────────────────────────────────────── */
+/* ─── Logo ──────────────────────────────── */
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   text-decoration: none;
   color: var(--text-primary);
   justify-self: start;
+  min-width: 0;
 }
 
 .logoFlag {
-  width: 18px;
-  height: 22px;
+  width: 16px; height: 20px;
   color: var(--accent);
   flex-shrink: 0;
 }
 
 .logoText {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 400;
   font-style: italic;
   color: var(--text-primary);
   letter-spacing: 0.01em;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ─── Center nav links ──────────────────────────── */
+/* ─── Center nav ────────────────────────── */
 .center {
   display: flex;
   align-items: center;
-  gap: 0;
   justify-self: center;
+  gap: 2px;
 }
 
 .navLink {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 500;
   color: var(--text-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
   transition: color var(--t-base) var(--ease), background var(--t-base) var(--ease);
   white-space: nowrap;
+  text-decoration: none;
 }
+.navLink:hover { color: var(--text-primary); background: var(--bg-overlay); }
 
-.navLink:hover {
-  color: var(--text-primary);
-  background: var(--bg-overlay);
-}
-
-/* ─── Actions ───────────────────────────────────── */
+/* ─── Actions ───────────────────────────── */
 .actions {
   display: flex;
   align-items: center;
   gap: 6px;
   justify-self: end;
+  flex-shrink: 0;
 }
 
 .coffeeBtn {
@@ -91,7 +103,7 @@
   align-items: center;
   gap: 5px;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   color: var(--text-muted);
@@ -102,6 +114,7 @@
   text-decoration: none;
   transition: all var(--t-base) var(--ease);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .coffeeBtn:hover { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-overlay); }
 
@@ -119,32 +132,39 @@
 
 .cta {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   background: var(--accent);
   color: var(--accent-text);
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
   transition: background var(--t-base) var(--ease);
   white-space: nowrap;
+  text-decoration: none;
+  flex-shrink: 0;
 }
 .cta:hover { background: var(--accent-hover); }
 
-/* ─── Responsive ────────────────────────────────── */
+/* ─── Breakpoints ───────────────────────── */
+/* Tablet: hide center nav */
 @media (max-width: 820px) {
   .center { display: none; }
   .inner { grid-template-columns: 1fr auto; }
-  .actions { justify-self: end; }
 }
 
-@media (max-width: 520px) {
+/* Mobile: hide coffee text, keep icon */
+@media (max-width: 540px) {
   .coffeeLabel { display: none; }
   .coffeeBtn { padding: 6px 8px; }
+  .inner { padding: 0 1rem; }
 }
 
+/* Small mobile: hide coffee entirely, shrink CTA */
 @media (max-width: 380px) {
   .coffeeBtn { display: none; }
-  .logoText { font-size: 0.95rem; }
+  .logoText { font-size: 0.9rem; }
+  .cta { padding: 7px 11px; font-size: 0.66rem; }
+  .inner { padding: 0 0.875rem; gap: 0.5rem; }
 }

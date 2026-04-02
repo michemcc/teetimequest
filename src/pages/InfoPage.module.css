@@ -178,3 +178,14 @@
   vertical-align: middle;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Mobile improvements ─────────────────── */
+@media (max-width: 480px) {
+  .content { padding: 3.5rem 1rem 4.5rem; }
+  .title { font-size: clamp(1.8rem, 8vw, 2.4rem); }
+  .grid { border-radius: 0; border-left: none; border-right: none; }
+  .card { padding: 1.5rem 1rem; }
+  .policyList { border-radius: 0; border-left: none; border-right: none; }
+  .policySection { padding: 1.25rem 1rem; }
+  .form { padding: 1.5rem 1rem; }
+}
