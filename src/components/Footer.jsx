@@ -8,6 +8,8 @@ export default function Footer() {
       {/* ── Main body ── */}
       <div className={styles.body}>
         <div className={`container ${styles.grid}`}>
+
+          {/* Brand */}
           <div className={styles.brand}>
             <Link to="/" className={styles.brandLogo}>
               <svg width="15" height="19" viewBox="0 0 20 24" fill="none">
@@ -18,10 +20,17 @@ export default function Footer() {
               <span className={styles.brandName}>TeeTimeQuest</span>
             </Link>
             <p className={styles.brandTagline}>Golf scheduling,<br/>finally solved.</p>
-            <a href="https://buymeacoffee.com/michemcc" target="_blank" rel="noopener noreferrer" className={styles.coffeeLink}>
+            <a
+              href="https://buymeacoffee.com/michemcc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.coffeeLink}
+            >
               ☕ Buy me a coffee
             </a>
           </div>
+
+          {/* Nav links */}
           <div className={styles.linkColumns}>
             <div className={styles.col}>
               <p className={styles.colLabel}>Product</p>
@@ -30,20 +39,21 @@ export default function Footer() {
             </div>
             <div className={styles.col}>
               <p className={styles.colLabel}>Company</p>
-              <Link to="/about" className={styles.colLink}>About</Link>
-              <Link to="/contact" className={styles.colLink}>Contact</Link>
-              <Link to="/privacy" className={styles.colLink}>Privacy</Link>
+              <Link to="/about"    className={styles.colLink}>About</Link>
+              <Link to="/contact"  className={styles.colLink}>Contact</Link>
+              <Link to="/privacy"  className={styles.colLink}>Privacy</Link>
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* ── Bottom bar ── completely self-contained, no .container dependency ── */}
+      {/* ── Bottom bar ── single flex row, always centered ── */}
       <div className={styles.bottom}>
         <span className={styles.copy}>© {new Date().getFullYear()} TeeTimeQuest</span>
-        <span className={styles.dot}>·</span>
+        <span className={styles.dot} aria-hidden="true">·</span>
         <Link to="/privacy" className={styles.bottomLink}>Privacy</Link>
-        <span className={styles.dot}>·</span>
+        <span className={styles.dot} aria-hidden="true">·</span>
         <Link to="/contact" className={styles.bottomLink}>Contact</Link>
       </div>
 

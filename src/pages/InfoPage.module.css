@@ -149,3 +149,32 @@
 
 .policySectionTitle { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: var(--text-primary); margin-bottom: 0.6rem; }
 .policySectionBody { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75; }
+
+/* ── Contact form error + spinner ─────────── */
+.formError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: color-mix(in srgb, #ef4444 8%, transparent);
+  border: 1px solid color-mix(in srgb, #ef4444 22%, transparent);
+  border-left: 3px solid #ef4444;
+  color: #dc2626;
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+[data-theme="dark"] .formError { color: #fca5a5; }
+
+.submitSpinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid color-mix(in srgb, var(--accent-text) 30%, transparent);
+  border-top-color: var(--accent-text);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
