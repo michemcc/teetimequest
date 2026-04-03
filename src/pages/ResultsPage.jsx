@@ -114,6 +114,13 @@ export default function ResultsPage() {
           {/* ── Left: results ── */}
           <div className={styles.leftCol}>
 
+            {hasMatch && round.match.storyline && (
+              <div className={styles.storylineCard}>
+                <div className={styles.storylineIcon}>⛳</div>
+                <p className={styles.storylineText}>{round.match.storyline}</p>
+              </div>
+            )}
+
             {hasMatch && (
               <div className={styles.matchCard}>
                 <div className={styles.matchGrid}>
@@ -154,13 +161,26 @@ export default function ResultsPage() {
                       <div className={styles.courseInfo}>
                         <div className={styles.courseNameRow}>
                           <span className={styles.courseName}>{course.name}</span>
-                          <span className={styles.courseRating}>★ {course.rating}</span>
+                          {course.rating != null && <span className={styles.courseRating}>★ {course.rating}</span>}
                         </div>
                         <span className={styles.courseAddr}>{course.address}</span>
+                        {course.website && (
+                          <a href={course.website} target="_blank" rel="noopener noreferrer" className={styles.courseWebsite}>
+                            Visit website →
+                          </a>
+                        )}
                         <div className={styles.courseTags}>
-                          <span className={styles.courseTag}>{course.holes} holes</span>
-                          <span className={styles.courseTag}>Par {course.par}</span>
-                          <span className={`${styles.courseTag} ${styles.courseTagPrice}`}>${course.price}/player</span>
+                          <span className={styles.courseTag}>{course.holes || 18} holes</span>
+                          <span className={styles.courseTag}>Par {course.par || 72}</span>
+                          {course.price != null && (
+                            <span className={`${styles.courseTag} ${styles.courseTagPrice}`}>${course.price}/player</span>
+                          )}
+                          {course.distanceMi != null && (
+                            <span className={styles.courseTag}>{course.distanceMi} mi away</span>
+                          )}
+                          {course.source === 'openstreetmap' && (
+                            <span className={styles.courseTagOsm}>OSM</span>
+                          )}
                         </div>
                       </div>
                       <div className={`${styles.courseCheck} ${selectedCourse === course.id ? styles.courseCheckActive : ''}`}>

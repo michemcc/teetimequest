@@ -302,3 +302,62 @@
   .waitCard { padding: 2rem 1rem; }
   .myLinkCard { padding: 1rem; }
 }
+
+/* ─── Storyline card ─────────────────────── */
+.storylineCard {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--navy-800, #1c2d3f);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(201,160,58,0.25);
+  box-shadow: 0 0 0 1px rgba(201,160,58,0.08);
+}
+[data-theme="dark"] .storylineCard {
+  background: var(--bg-raised);
+  border-color: var(--gold);
+}
+
+.storylineIcon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.storylineText {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+  color: var(--sand-100, #f4ede0);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+[data-theme="dark"] .storylineText { color: var(--text-primary); }
+
+/* ─── Course website link ────────────────── */
+.courseWebsite {
+  font-family: var(--font-score);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  text-decoration: none;
+  display: block;
+  margin-top: 3px;
+  transition: color var(--t-base) var(--ease);
+}
+.courseWebsite:hover { color: var(--accent-hover); text-decoration: underline; }
+
+/* ─── OSM source badge ───────────────────── */
+.courseTagOsm {
+  font-family: var(--font-score);
+  font-size: 0.52rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  background: rgba(96,165,250,0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(96,165,250,0.25);
+  letter-spacing: 0.06em;
+}

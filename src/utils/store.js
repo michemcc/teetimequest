@@ -17,6 +17,7 @@
 
 import { nanoid } from 'nanoid'
 import { supabase } from './supabase'
+import { findCoursesNearCity } from './courses'
 
 /* ─── Backend detection ─────────────────────────────────────────────────── */
 
@@ -311,7 +312,7 @@ function _local_createRound({
 
   const allResponded = round.players.every(p => p.availability)
   if (allResponded) {
-    round.match  = computeMatch(round)
+    round.match  = await computeMatch(round)
     round.status = round.match ? 'matched' : 'collecting'
   }
 
@@ -332,7 +333,7 @@ function _local_saveAvailability(roundId, playerId, availability) {
 
   const allResponded = round.players.every(p => p.availability)
   if (allResponded) {
-    round.match  = computeMatch(round)
+    round.match  = await computeMatch(round)
     round.status = round.match ? 'matched' : 'collecting'
   }
 
@@ -344,6 +345,77 @@ function _local_saveAvailability(roundId, playerId, availability) {
    MATCH COMPUTATION — shared by both backends
 ═══════════════════════════════════════════════════════════════════════════ */
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STORYLINE GENERATOR
+   Creates a fun, punchy narrative about the round. Pure client-side —
+   no API call, instant, works offline. Uses player names, city, date,
+   tee time and course name to produce something that feels personal.
+═══════════════════════════════════════════════════════════════════════════ */
+
+const OPENERS = [
+  "The crew is locked in.",
+  "It's official — the round is on.",
+  "Mark the calendar.",
+  "Game day is coming.",
+  "The fairways await.",
+  "Clubs out, chaos incoming.",
+  "The group chat can finally rest.",
+  "Someone's going home with a story.",
+]
+
+const FORMATS = [
+  ({ names, city, date, teeTime, course }) =>
+    `${names} are heading to ${city} for a morning on the links. Tee time is ${teeTime} — ${course ? `at ${course}` : 'course TBD'}. May the best player win, and may everyone else at least pretend to be happy about it.`,
+
+  ({ names, city, teeTime, course }) =>
+    `${names} have officially committed to ${city}. The ${teeTime} slot is locked in${course ? ` at ${course}` : ''}. Handicaps will be questioned, mulligans will be debated, and at least one person will blame the wind.`,
+
+  ({ names, city, date, teeTime }) =>
+    `The squad is teeing off in ${city}. ${teeTime} on ${date} — no excuses, no rain checks. ${names} made it happen against all scheduling odds. That's either impressive or slightly concerning.`,
+
+  ({ names, city, course, teeTime }) =>
+    `${city} better be ready. ${names} are descending on the fairways${course ? ` of ${course}` : ''} at ${teeTime}. Birdies will be attempted. Pars will be celebrated. Bogeys will be diplomatically not mentioned.`,
+
+  ({ names, teeTime, city, course }) =>
+    `${teeTime} in ${city}${course ? ` at ${course}` : ''}. ${names} finally stopped texting and actually locked in a date. Golf will be played. Stories will be told. Scores may or may not be recorded accurately.`,
+]
+
+function generateStoryline(round, date, teeTime, topCourse) {
+  // Build a readable list of player first names
+  const firstNames = round.players.map(p => p.name.split(' ')[0])
+  let names
+  if (firstNames.length === 1) {
+    names = firstNames[0]
+  } else if (firstNames.length === 2) {
+    names = firstNames.join(' and ')
+  } else {
+    names = firstNames.slice(0, -1).join(', ') + ', and ' + firstNames[firstNames.length - 1]
+  }
+
+  // Format the date nicely
+  let dateStr = date
+  try {
+    const d = new Date(date + 'T00:00:00')
+    dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  } catch {}
+
+  const ctx = {
+    names,
+    city:    round.city,
+    date:    dateStr,
+    teeTime,
+    course:  topCourse?.name || null,
+  }
+
+  // Pick a random opener and format, seeded loosely by round ID for consistency
+  const seed    = round.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+  const opener  = OPENERS[seed % OPENERS.length]
+  const format  = FORMATS[(seed + 3) % FORMATS.length]
+
+  return `${opener} ${format(ctx)}`
+}
+
 const MOCK_COURSES = [
   { id: 'c1', name: 'Pebble Creek Golf Club', address: '1 Pebble Creek Dr', rating: 4.8, par: 72, holes: 18, price: 85  },
   { id: 'c2', name: 'Meadowlark Links',        address: '450 Links Blvd',    rating: 4.5, par: 71, holes: 18, price: 60  },
@@ -352,7 +424,7 @@ const MOCK_COURSES = [
   { id: 'c5', name: 'Sunridge Country Club',   address: '9 Sunridge Ln',     rating: 4.6, par: 72, holes: 18, price: 95  },
 ]
 
-function computeMatch(round) {
+async function computeMatch(round) {
   const dateSets = round.players
     .filter(p => p.availability?.dates?.length)
     .map(p => new Set(p.availability.dates))
@@ -392,13 +464,29 @@ function computeMatch(round) {
   const candidates = teeTimeMap[topPref] || ['8:00 AM', '8:30 AM', '9:00 AM']
   const teeTime = candidates[Math.floor(Math.random() * candidates.length)]
 
-  const shuffled = [...MOCK_COURSES].sort(() => (round.id.charCodeAt(0) % 2 === 0 ? 1 : -1))
+  /* ── Real course discovery via OpenStreetMap ── */
+  let suggestedCourses = null
+  try {
+    suggestedCourses = await findCoursesNearCity(round.city, 5)
+  } catch (err) {
+    console.warn('[courses] OSM lookup failed, falling back to mock:', err.message)
+  }
+
+  // Fall back to mock data if OSM returns nothing or errors
+  if (!suggestedCourses || suggestedCourses.length === 0) {
+    const shuffled = [...MOCK_COURSES].sort(() => (round.id.charCodeAt(0) % 2 === 0 ? 1 : -1))
+    suggestedCourses = shuffled.slice(0, 3)
+  }
+
+  /* ── Storyline generation ── */
+  const storyline = generateStoryline(round, commonDates[0], teeTime, suggestedCourses[0])
 
   return {
     date: commonDates[0],
     teeTime,
     commonDatesCount: commonDates.length,
-    suggestedCourses: shuffled.slice(0, 3),
+    suggestedCourses,
     confirmedCourse:  null,
+    storyline,
   }
 }
