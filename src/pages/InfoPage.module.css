@@ -1,5 +1,5 @@
 .page { min-height: 100vh; background: var(--bg-base); display: flex; flex-direction: column; }
-.content { padding: 4rem 1.25rem 4.5rem; flex: 1; }
+.content { padding: 4rem 1.25rem 5.5rem; flex: 1; }
 
 /* ─── Hero ───────────────────────────────────────────── */
 .hero { margin-bottom: 2.5rem; }
@@ -59,6 +59,7 @@
   gap: 1rem; flex-wrap: wrap;
   background: var(--bg-surface); border: 1px solid var(--border-strong);
   border-radius: var(--radius-md); padding: 1.5rem 2rem;
+  margin-bottom: 2.5rem;
 }
 .ctaText { font-size: 0.9rem; color: var(--text-secondary); }
 .ctaBtn {

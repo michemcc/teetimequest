@@ -118,14 +118,6 @@ See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for step-by-step instructions on:
 
 ---
 
-## Versioning
-
-This project uses `YYYY.MAJOR.MINOR` versioning. Current version: **2026.1.1**
-
-See **[CHANGELOG.md](./CHANGELOG.md)** for the full release history and upgrade notes.
-
----
-
 ## Package safety
 
 Dependencies are pinned to exact versions. See **[NPM_SAFETY.md](./NPM_SAFETY.md)** for the full guide on keeping installs reproducible and avoiding packages published less than 7 days ago.
