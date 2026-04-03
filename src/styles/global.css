@@ -252,3 +252,15 @@ img { max-width: 100%; display: block; }
 
 /* ── Selection ───────────────────────────────── */
 ::selection { background: var(--accent-light); color: var(--text-primary); }
+
+/* ── iOS/Android zoom prevention ────────────────────────────
+   Browsers auto-zoom when input font-size < 16px.
+   Force 16px on mobile so focus never triggers a zoom.
+   We use font-size: 1rem (16px) at the touch breakpoint only
+   so the visual size stays as designed on desktop.
+──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  input, textarea, select {
+    font-size: 1rem !important;
+  }
+}

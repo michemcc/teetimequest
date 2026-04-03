@@ -119,6 +119,7 @@
 .dateGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(114px, 1fr)); gap: 5px; }
 
 .dateBtn {
+  touch-action: manipulation;
   padding: 9px 10px;
   border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
   font-size: 0.78rem; font-weight: 400; color: var(--text-secondary);
@@ -133,6 +134,7 @@
 @media (max-width: 360px) { .timeGrid { grid-template-columns: 1fr; } }
 
 .timeBtn {
+  touch-action: manipulation;
   padding: 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
   background: var(--bg-base); text-align: left;
   display: flex; flex-direction: column; gap: 3px;

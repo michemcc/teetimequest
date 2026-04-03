@@ -137,6 +137,7 @@
 
 .input {
   height: 40px; padding: 0 12px;
+  touch-action: manipulation;
   border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
   font-size: 0.875rem; color: var(--text-primary); background: var(--bg-base);
   outline: none; width: 100%;
