@@ -44,7 +44,7 @@ export default function AboutPage() {
             <h2 className={styles.cardTitle}>Built with care</h2>
             <p className={styles.cardText}>
               TeeTimeQuest is a passion project. No VC funding, no ads, no selling your data.
-              Just a clean tool that does one thing well — so you can spend less time
+              Just a clean tool that does one thing well , so you can spend less time
               scheduling and more time on the course.
             </p>
           </div>

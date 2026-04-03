@@ -5,9 +5,9 @@ import styles from './LandingPage.module.css'
 
 const steps = [
   { num:'01', title:'Create a round',    desc:'Enter names and emails. Done in 60 seconds.',                icon:'🏌️' },
-  { num:'02', title:'Share links',       desc:'Each player gets a unique invite — no account needed.',     icon:'🔗' },
+  { num:'02', title:'Share links',       desc:'Each player gets a unique invite , no account needed.',     icon:'🔗' },
   { num:'03', title:'Mark availability', desc:'Everyone taps their open dates and preferred tee time.',    icon:'📅' },
-  { num:'04', title:'We find the match', desc:'Best date, time and nearby courses — surfaced for you.',    icon:'📍' },
+  { num:'04', title:'We find the match', desc:'Best date, time and nearby courses , surfaced for you.',    icon:'📍' },
   { num:'05', title:'Confirm & play',    desc:'One tap to lock in the course. First tee awaits.',          icon:'⛳' },
 ]
 
@@ -36,7 +36,7 @@ export default function LandingPage() {
             </h1>
             <p className={styles.heroDesc}>
               TeeTimeQuest coordinates everyone's schedule, finds public courses nearby,
-              and locks in a tee time — without the 47-message group chat.
+              and locks in a tee time , no 47-message group chat.
             </p>
             <div className={styles.heroCtas}>
               <Link to="/create" className={styles.btnPrimary}>Plan a round →</Link>

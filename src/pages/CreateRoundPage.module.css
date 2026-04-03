@@ -236,17 +236,24 @@
 
 .submit {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--accent); color: var(--accent-text);
-  font-size: 0.85rem; font-weight: 600;
-  padding: 14px 24px; border-radius: var(--radius-sm); width: 100%;
-  border: none; cursor: pointer; margin-top: 1.25rem;
-  transition: background var(--t-base) var(--ease), transform var(--t-fast) var(--ease), box-shadow var(--t-base) var(--ease);
+  background: var(--gold-400); color: var(--green-900);
+  font-family: var(--font-score); font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 15px 24px; border-radius: var(--radius-xs); width: 100%;
+  border: 1px solid var(--gold-500); cursor: pointer; margin-top: 1.25rem;
+  box-shadow: 0 4px 0 var(--gold-600), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition: all var(--t-fast) var(--ease);
 }
 .submit:hover:not(:disabled) {
-  background: var(--accent-hover); transform: translateY(-1px);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
+  background: var(--gold-300);
+  box-shadow: 0 6px 0 var(--gold-600), inset 0 1px 0 rgba(255,255,255,0.3);
+  transform: translateY(-2px);
 }
-.submit:disabled { opacity: 0.45; cursor: not-allowed; }
+.submit:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--gold-600);
+}
+.submit:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 
 .spinner {
   width: 13px; height: 13px;

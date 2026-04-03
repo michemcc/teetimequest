@@ -74,7 +74,7 @@ export default function ContactPage() {
           <div className={styles.chip}>Contact</div>
           <h1 className={styles.title}>Get in touch.</h1>
           <p className={styles.lead}>
-            Bug report, feature idea, or just want to say hi — we'd love to hear from you.
+            Bug report, feature idea, or just want to say hi , we'd love to hear from you.
           </p>
         </div>
 

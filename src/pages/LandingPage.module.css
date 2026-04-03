@@ -3,38 +3,62 @@
 /* ── Shared buttons ──────────────────────── */
 .btnPrimary {
   display: inline-flex; align-items: center; gap: 8px;
-  background: var(--accent); color: var(--accent-text);
-  font-family: var(--font-score); font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  padding: 13px 24px; border-radius: var(--radius-sm);
-  border: 2px solid var(--accent);
-  transition: all var(--t-base) var(--ease);
+  background: var(--gold-400); color: var(--green-900);
+  font-family: var(--font-score); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 13px 26px; border-radius: var(--radius-xs);
+  /* Arcade inset shadow — pixel button effect */
+  border: 2px solid var(--gold-500);
+  box-shadow: 0 4px 0 var(--gold-600), inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: all var(--t-fast) var(--ease);
+  position: relative;
 }
 .btnPrimary:hover {
-  background: var(--accent-hover); border-color: var(--accent-hover);
-  transform: translateY(-2px); box-shadow: 0 6px 20px rgba(45,90,61,0.35);
+  background: var(--gold-300);
+  box-shadow: 0 6px 0 var(--gold-600), inset 0 1px 0 rgba(255,255,255,0.35);
+  transform: translateY(-2px);
+}
+.btnPrimary:active {
+  transform: translateY(2px);
+  box-shadow: 0 0px 0 var(--gold-600), inset 0 1px 0 rgba(0,0,0,0.1);
 }
 
 .btnGhost {
   display: inline-flex; align-items: center;
   font-family: var(--font-score); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-secondary); padding: 13px 20px;
-  border: 2px solid var(--border-strong); border-radius: var(--radius-sm);
+  /* Hero is dark green — use light colours so it's always visible */
+  color: rgba(255,255,255,0.75); padding: 13px 20px;
+  border: 2px solid rgba(255,255,255,0.30); border-radius: var(--radius-sm);
   transition: all var(--t-base) var(--ease);
+  background: transparent;
 }
-.btnGhost:hover { color: var(--text-primary); border-color: var(--accent); }
+.btnGhost:hover {
+  color: var(--sand-100);
+  border-color: var(--gold-300);
+  background: rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .btnGhost {
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+}
+[data-theme="dark"] .btnGhost:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: var(--bg-overlay);
+}
 
 /* ══════════════════════════════════════════
    HERO — scoreboard on a fairway
 ══════════════════════════════════════════ */
 .hero {
-  background: var(--green-800);
+  background:
+    linear-gradient(160deg, var(--green-900) 0%, var(--green-700) 60%, var(--green-800) 100%);
   padding: 72px 0 80px;
   position: relative;
   overflow: hidden;
 }
 [data-theme="dark"] .hero {
-  background: var(--bg-surface);
+  background: linear-gradient(160deg, var(--bg-base) 0%, var(--bg-surface) 100%);
   border-bottom: 1px solid var(--border-strong);
 }
 
@@ -46,15 +70,21 @@
   background-size: 28px 28px;
   pointer-events: none;
 }
-/* Fairway stripe overlay */
+/* Scanline + fairway stripe arcade overlay */
 .hero::after {
   content: '';
   position: absolute; inset: 0;
-  background-image: repeating-linear-gradient(
-    to right,
-    transparent, transparent 80px,
-    rgba(255,255,255,0.012) 80px, rgba(255,255,255,0.012) 160px
-  );
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
+    ),
+    repeating-linear-gradient(
+      to right,
+      transparent, transparent 80px,
+      rgba(255,255,255,0.015) 80px, rgba(255,255,255,0.015) 160px
+    );
   pointer-events: none;
 }
 
@@ -255,11 +285,15 @@
 
 .statNum {
   font-family: var(--font-score);
-  font-size: 1.8rem; font-weight: 700;
+  font-size: 2.2rem; font-weight: 700;
   color: var(--gold-300); line-height: 1;
   letter-spacing: -0.04em;
+  text-shadow: 0 2px 8px rgba(201,160,58,0.4);
 }
-[data-theme="dark"] .statNum { color: var(--gold); }
+[data-theme="dark"] .statNum {
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(201,160,58,0.35);
+}
 
 .statLabel {
   font-family: var(--font-score);
@@ -287,7 +321,7 @@
   color: var(--flag);
   display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem;
 }
-.sectionRule::before { content: ''; width: 16px; height: 2px; background: var(--flag); }
+.sectionRule::before { content: '⛳'; font-size: 0.8rem; }
 
 .sectionTitle {
   font-family: var(--font-display);
@@ -322,11 +356,16 @@
 .stepTop { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.1rem; }
 .stepNum {
   font-family: var(--font-score); font-size: 0.58rem; font-weight: 700;
-  color: var(--bg-scorecard); background: var(--accent);
-  padding: 2px 7px; border-radius: var(--radius-xs);
+  color: var(--green-900); background: var(--gold-400);
+  padding: 3px 8px; border-radius: 0; /* pixel square */
   letter-spacing: 0.06em;
+  box-shadow: 2px 2px 0 var(--gold-600);
 }
-[data-theme="dark"] .stepNum { color: var(--accent-text); }
+[data-theme="dark"] .stepNum {
+  color: var(--green-950, #0f1f14);
+  background: var(--gold);
+  box-shadow: 2px 2px 0 var(--gold-600);
+}
 
 .stepIcon { font-size: 1.2rem; }
 .stepTitle { font-family: var(--font-display); font-style: italic; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.4rem; }
@@ -402,7 +441,7 @@
   color: var(--gold-300);
   display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem;
 }
-.ctaEyebrow::before { content: '⛳'; font-size: 0.85rem; }
+.ctaEyebrow::before { content: '★'; font-size: 0.75rem; }
 [data-theme="dark"] .ctaEyebrow { color: var(--gold); }
 
 .ctaTitle {

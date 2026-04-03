@@ -67,7 +67,7 @@ export default function Nav() {
           </button>
 
           <Link to="/create" className={styles.cta}>
-            Plan a round
+            Play
           </Link>
         </div>
       </div>

@@ -153,7 +153,7 @@ export default function AvailabilityPage() {
                 <p className={styles.successTitle}>You're in!</p>
                 <p className={styles.successDesc}>
                   {allResponded
-                    ? 'Everyone responded — results are ready.'
+                    ? 'Everyone responded, results are ready.'
                     : "We'll notify you when the tee time is confirmed."}
                 </p>
               </div>
