@@ -1,123 +1,139 @@
-# ⛳ TeeTimeQuest
+# ⛳ TeeTimeQuest — v2026.2.2
 
-**Coordinate golf tee times with your group — zero group-chat chaos.**
+**Coordinate golf tee times with your group. Zero group-chat chaos.**
 
-TeeTimeQuest lets a group of golfers share their availability, then automatically finds the best date, suggests public courses central to everyone's location, and surfaces an available tee time.
-
----
-
-## Features
-
-- **Round creation** — organizer enters player emails in 60 seconds
-- **Personal invite links** — each player gets a unique link (no login required)
-- **Availability picker** — tap dates + choose preferred tee time window
-- **Smart matching** — finds intersection of available dates; falls back to majority if needed
-- **Course triangulation** — suggests public courses near the group's center point
-- **Tee time suggestion** — picks a time slot matching the group's preferences
-- **Mobile-first** — fully responsive, works great on any phone
-- **Instant copy** — one-tap copy of any player's invite link
+TeeTimeQuest lets a group of 2-8 golfers share availability, then automatically finds the best shared date, suggests public courses central to everyone's location, and surfaces a matching tee time. No accounts. No downloads. Just a link.
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | React 18 + Vite |
-| Routing | React Router v6 |
-| Styling | CSS Modules |
-| Date utils | date-fns |
-| ID generation | nanoid |
-| Storage | localStorage (swap for a real backend) |
-
----
-
-## Getting Started
+## Quick start
 
 ```bash
 npm install
 npm run dev
-# open http://localhost:3000
 ```
+
+For email invites and the cleanup cron to work locally, use `vercel dev` instead (requires Vercel CLI).
 
 ---
 
-## Project Structure
+## Tech stack
+
+| Layer | Technology | Version |
+|---|---|---|
+| Framework | React | 18.3.1 |
+| Build | Vite | 6.0.11 |
+| Routing | React Router | 6.28.1 |
+| Database | Supabase (Postgres) | 2.47.10 |
+| Email | Brevo | REST API |
+| Contact form | Formspree | mojpnkyn |
+| Date utils | date-fns | 4.1.0 |
+| IDs | nanoid | 5.0.9 |
+
+---
+
+## Environment variables
+
+| Variable | Used by | Notes |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Browser | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Browser | anon key, safe to expose |
+| `BREVO_API_KEY` | api/send-invite.js | Server-side only |
+| `BREVO_SENDER_EMAIL` | api/send-invite.js | Must be verified in Brevo |
+| `SUPABASE_SERVICE_ROLE_KEY` | api/cleanup.js | Server-side only, never VITE_ prefix |
+| `CRON_SECRET` | api/cleanup.js | Random string, protects the endpoint |
+
+---
+
+## Project structure
 
 ```
 teetimequest/
-├── index.html
-├── vite.config.js
-├── package.json
-└── src/
-    ├── main.jsx
-    ├── App.jsx
-    ├── styles/global.css
-    ├── components/
-    │   ├── Nav.jsx
-    │   └── Nav.module.css
-    ├── pages/
-    │   ├── LandingPage.jsx / .module.css
-    │   ├── CreateRoundPage.jsx / .module.css
-    │   ├── AvailabilityPage.jsx / .module.css
-    │   ├── ResultsPage.jsx / .module.css
-    │   └── NotFoundPage.jsx / .module.css
-    └── utils/
-        ├── store.js      ← swap this for your real API
-        └── dates.js
+├── api/
+│   ├── send-invite.js     Brevo invite email (Vercel serverless)
+│   └── cleanup.js         Daily round cleanup (Vercel cron)
+├── src/
+│   ├── components/        Nav, Footer, CityPicker
+│   ├── pages/             All page components + CSS modules
+│   ├── styles/global.css  Design system tokens
+│   └── utils/
+│       ├── store.js        Supabase + localStorage fallback
+│       ├── supabase.js     Supabase client singleton
+│       ├── email.js        sendInviteEmails() utility
+│       └── dates.js
+└── supabase/
+    ├── migration_2026_2_0.sql   Run once: schema setup
+    └── cleanup_rounds.sql       Run once: cleanup function
 ```
 
 ---
 
-## Routes
+## Database setup
 
-| Route | Page |
-|---|---|
-| `/` | Landing / marketing |
-| `/create` | Organizer setup form |
-| `/results/:roundId` | Dashboard + invite links |
-| `/availability/:roundId/:playerId` | Player date picker |
+Run these files in order in your Supabase SQL Editor:
+
+1. `supabase/migration_2026_2_0.sql` -- creates rounds + players tables, RLS, realtime
+2. `supabase/cleanup_rounds.sql` -- creates the cleanup_old_rounds() function
 
 ---
 
-## Connecting a Real Backend
+## Automated round cleanup
 
-All data logic lives in `src/utils/store.js`. Replace the three functions with real API calls:
+Rounds delete automatically the day after the matched tee date. Stale collecting rounds delete after 30 days. Players delete via CASCADE.
 
-- `createRound()` → `POST /api/rounds`
-- `getRound()` → `GET /api/rounds/:id`
-- `saveAvailability()` → `PATCH /api/rounds/:roundId/players/:playerId`
+**How it works:** `api/cleanup.js` is called daily by Vercel Cron at 4am UTC, which calls `cleanup_old_rounds()` in Postgres using the service role key. Configured in `vercel.json`:
 
-Add email delivery on round creation so each player automatically receives their invite link.
+```json
+"crons": [{ "path": "/api/cleanup", "schedule": "0 4 * * *" }]
+```
+
+**Preview what would be deleted (safe, no deletes):**
+```sql
+SELECT id, city, status, match->>'date' AS tee_date
+FROM rounds
+WHERE
+  (status IN ('matched','booked') AND (match->>'date')::date < current_date)
+  OR (status = 'collecting' AND created_at < now() - interval '30 days');
+```
+
+**Run manually:**
+```sql
+SELECT cleanup_old_rounds();
+```
+
+Or via curl:
+```bash
+curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://teetimequest.com/api/cleanup
+```
+
+**Supabase Pro alternative:** Schedule directly with pg_cron instead of the Vercel function:
+```sql
+SELECT cron.schedule('cleanup-old-rounds', '0 4 * * *', 'SELECT cleanup_old_rounds()');
+```
 
 ---
 
-## Tee-Time API Suggestions
+## Versioning
 
-Replace the mock courses in `computeMatch()` with:
+Format: `YYYY.MAJOR.MINOR`. Bump in three places when releasing:
+- `src/components/Nav.jsx` -- const VERSION
+- `src/components/Footer.jsx` -- const VERSION
+- `package.json` -- "version"
 
-- **GolfNow / TeeOff API** — live tee time availability + booking
-- **Google Places API** — course discovery by lat/lng
-- **Mapbox Geocoding** — convert player zip codes to coordinates for triangulation
+---
+
+## Deployment
+
+See `DEPLOYMENT.md` for Vercel + AWS Route 53 instructions.
+
+---
+
+## Package safety
+
+All deps pinned to exact versions. `.npmrc` enforces `save-exact=true`. See `NPM_SAFETY.md`.
 
 ---
 
 ## License
 
 MIT
-
----
-
-## Deployment
-
-See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for step-by-step instructions on:
-- Deploying to Vercel (free tier)
-- Buying a domain on AWS Route 53
-- Connecting your custom domain to Vercel
-- SSL setup (automatic)
-
----
-
-## Package safety
-
-Dependencies are pinned to exact versions. See **[NPM_SAFETY.md](./NPM_SAFETY.md)** for the full guide on keeping installs reproducible and avoiding packages published less than 7 days ago.

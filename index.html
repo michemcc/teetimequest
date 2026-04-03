@@ -3,20 +3,178 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="TeeTimeQuest — Golf scheduling, finally solved. Coordinate tee times with your crew." />
-    <meta name="theme-color" content="#2d5a3d" />
-    <meta property="og:title" content="TeeTimeQuest" />
-    <meta property="og:description" content="Golf scheduling, finally solved. Coordinate tee times with your crew." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://teetimequest.com" />
+
+    <!-- ── Primary meta ── -->
     <title>TeeTimeQuest | Golf Scheduling</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="description" content="Coordinate golf tee times with your group in 60 seconds. Share availability, find a date everyone can make, and book a public course nearby. Free, no account required." />
+    <meta name="keywords" content="golf scheduling, tee time, golf group, book tee time, golf availability, coordinate golf, golf planner" />
+    <meta name="author" content="TeeTimeQuest" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://teetimequest.com/" />
+    <meta name="theme-color" content="#2d5a3d" />
+
+    <!-- ── Open Graph (Facebook, LinkedIn, iMessage) ── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:url"         content="https://teetimequest.com/" />
+    <meta property="og:title"       content="TeeTimeQuest | Golf Scheduling" />
+    <meta property="og:description" content="Coordinate golf tee times with your group in 60 seconds. No accounts, no app, just a link." />
+    <meta property="og:image"       content="https://teetimequest.com/og-image.png" />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name"   content="TeeTimeQuest" />
+    <meta property="og:locale"      content="en_US" />
+
+    <!-- ── Twitter / X card ── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content="TeeTimeQuest | Golf Scheduling" />
+    <meta name="twitter:description" content="Coordinate golf tee times with your group in 60 seconds. Free, no account required." />
+    <meta name="twitter:image"       content="https://teetimequest.com/og-image.png" />
+
+    <!-- ── Favicon ── -->
+    <link rel="icon"             type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon"             type="image/x-icon"  href="/favicon.ico" />
+    <link rel="apple-touch-icon"                      href="/apple-touch-icon.png" />
+
+    <!-- ── Fonts ── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- DM Serif Display (display) + Space Mono (numbers/labels) + Outfit (body) -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- ══════════════════════════════════════════════════════
+         STRUCTURED DATA — JSON-LD
+         Tells Google exactly what this site is and does.
+         Renders rich results in search (name, description,
+         sitelinks, FAQ, breadcrumbs).
+    ══════════════════════════════════════════════════════ -->
+
+    <!-- 1. WebApplication schema — triggers "app" rich result -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TeeTimeQuest",
+      "url": "https://teetimequest.com",
+      "description": "Coordinate golf tee times with your group. Share availability, find the best date, and book a public course nearby. Free, no account required.",
+      "applicationCategory": "SportsApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Golf group scheduling",
+        "Availability matching",
+        "Public course finder",
+        "Tee time suggestions",
+        "Invite link sharing"
+      ],
+      "screenshot": "https://teetimequest.com/og-image.png",
+      "author": {
+        "@type": "Person",
+        "name": "Michael McCarthy",
+        "url": "https://teetimequest.com/about"
+      }
+    }
+    </script>
+
+    <!-- 2. Organization schema — brand identity for Google Knowledge Panel -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "TeeTimeQuest",
+      "url": "https://teetimequest.com",
+      "logo": "https://teetimequest.com/favicon.svg",
+      "description": "Golf scheduling made simple. Coordinate tee times with your group without the group-chat chaos.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "url": "https://teetimequest.com/contact"
+      },
+      "sameAs": []
+    }
+    </script>
+
+    <!-- 3. FAQPage schema — triggers FAQ accordion in Google results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does TeeTimeQuest work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The organizer creates a round and enters player emails. Each player receives a unique invite link to mark their available dates and preferred tee time window. TeeTimeQuest finds the best overlapping date, suggests public golf courses central to the group, and surfaces an available tee time."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is TeeTimeQuest free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, TeeTimeQuest is completely free to use. No account, no subscription, and no app download required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do players need to create an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Players receive a unique personal link and can submit their availability directly. No login, no password, no account of any kind."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many players can join a round?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TeeTimeQuest supports 2 to 8 players per round."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does TeeTimeQuest find golf courses?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TeeTimeQuest finds public golf courses near the geographic center of your group, based on each player's location. It suggests courses and tee times that match your group's preferred schedule window."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <!-- 4. BreadcrumbList — helps Google understand site structure -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://teetimequest.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Plan a Round",
+          "item": "https://teetimequest.com/create"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "About",
+          "item": "https://teetimequest.com/about"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Theme flash prevention — must be synchronous -->
     <script>
       (function() {
         var saved = localStorage.getItem('teetimequest-theme') || 'light';
