@@ -44,36 +44,74 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className={styles.heroCard}>
-            <div className={styles.heroCardBar}>
-              <span className={styles.heroCardDot} style={{background:'#c0392b'}}/>
-              <span className={styles.heroCardDot} style={{background:'#e67e22'}}/>
-              <span className={styles.heroCardDot} style={{background:'var(--accent)'}}/>
-              <span className={styles.heroCardBarLabel}>round_boston_2025.ttq</span>
+          <div className={styles.scoreCard}>
+            {/* ── Scoreboard title bar ── */}
+            <div className={styles.scoreCardTitle}>
+              <span className={styles.scoreCardTitleText}>⛳ ROUND STATUS</span>
+              <span className={styles.scoreCardLive}><span className={styles.liveDot}/>LIVE</span>
             </div>
-            <div className={styles.heroCardStats}>
-              <div className={styles.heroStat}><span className={styles.heroStatNum}>4</span><span className={styles.heroStatLabel}>Invited</span></div>
-              <div className={styles.heroStatDivider}/>
-              <div className={styles.heroStat}><span className={styles.heroStatNum}>3</span><span className={styles.heroStatLabel}>Responded</span></div>
-              <div className={styles.heroStatDivider}/>
-              <div className={styles.heroStat}><span className={styles.heroStatNum}>Sat</span><span className={styles.heroStatLabel}>Best date</span></div>
-            </div>
-            <div className={styles.heroCardMatch}>
-              <span className={styles.heroCardMatchIcon}>⛳</span>
-              <div>
-                <p className={styles.heroCardMatchName}>Pebble Creek Golf Club</p>
-                <p className={styles.heroCardMatchMeta}>8:30 AM · Par 72 · $85 / player</p>
+
+            {/* ── Hole-style stat row ── */}
+            <div className={styles.scoreCardHoles}>
+              <div className={styles.holeCell}>
+                <div className={styles.holeCellLabel}>PLAYERS</div>
+                <div className={styles.holeCellNum} data-color="gold">4</div>
+                <div className={styles.holeCellSub}>invited</div>
               </div>
-              <span className={styles.heroCardMatchBadge}>Match</span>
+              <div className={styles.holeCell}>
+                <div className={styles.holeCellLabel}>CONFIRMED</div>
+                <div className={styles.holeCellNum} data-color="green">3</div>
+                <div className={styles.holeCellSub}>responded</div>
+              </div>
+              <div className={styles.holeCell}>
+                <div className={styles.holeCellLabel}>TEE DATE</div>
+                <div className={styles.holeCellNum} data-color="blue">SAT</div>
+                <div className={styles.holeCellSub}>best match</div>
+              </div>
+              <div className={styles.holeCell}>
+                <div className={styles.holeCellLabel}>TEE TIME</div>
+                <div className={styles.holeCellNum} data-color="red">8:30</div>
+                <div className={styles.holeCellSub}>AM</div>
+              </div>
             </div>
-            <div className={styles.heroCardPlayers}>
-              {['T','M','J','K'].map((l,i) => (
-                <div key={l} className={styles.heroAvatar} style={{zIndex:4-i}}>
-                  {l}
-                  <span className={`${styles.heroAvatarDot} ${i<3?styles.green:''}`}/>
-                </div>
-              ))}
-              <span className={styles.heroPlayersLabel}>3 of 4 responded</span>
+
+            {/* ── Progress bar ── */}
+            <div className={styles.scoreCardProgress}>
+              <div className={styles.progressLabel}>
+                <span>AVAILABILITY COLLECTED</span>
+                <span className={styles.progressPct}>75%</span>
+              </div>
+              <div className={styles.progressTrack}>
+                <div className={styles.progressFill} style={{width:'75%'}}/>
+              </div>
+            </div>
+
+            {/* ── Course match row ── */}
+            <div className={styles.scoreCardCourse}>
+              <div className={styles.courseFlag}>⛳</div>
+              <div className={styles.courseInfo}>
+                <div className={styles.courseName}>Pebble Creek Golf Club</div>
+                <div className={styles.courseMeta}>PAR 72 · $85/PLAYER · BOSTON, MA</div>
+              </div>
+              <div className={styles.courseBadge}>MATCH</div>
+            </div>
+
+            {/* ── Players row ── */}
+            <div className={styles.scoreCardPlayers}>
+              <div className={styles.playerSlots}>
+                {[
+                  {init:'T', done:true},
+                  {init:'M', done:true},
+                  {init:'J', done:true},
+                  {init:'K', done:false},
+                ].map((p,i) => (
+                  <div key={i} className={`${styles.playerSlot} ${p.done ? styles.playerSlotDone : ''}`}>
+                    {p.init}
+                    {p.done && <span className={styles.playerCheck}>✓</span>}
+                  </div>
+                ))}
+              </div>
+              <span className={styles.playerStatus}>3/4 READY TO PLAY</span>
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@
 .headerBadge {
   font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500;
   letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-muted); background: var(--bg-scorecard, var(--bg-overlay));
+  color: var(--text-muted); background: linear-gradient(to bottom, var(--bg-overlay), var(--bg-inset));
   border: 1px solid var(--border-score, var(--border-strong));
   padding: 3px 8px; border-radius: var(--radius-sm);
 }
@@ -54,8 +54,9 @@
   display: grid;
   grid-template-columns: 56px 1fr;
   /* No gap — rail and content share the card */
-  transition: background var(--t-slow) var(--ease);
+  transition: background var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease);
 }
+.card:hover { box-shadow: var(--shadow-sm); }
 
 /* First card rounded top */
 .card:first-of-type { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
@@ -77,35 +78,17 @@
 
 /* Numbered badge */
 .stepBadge {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: var(--accent-text);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 0 0 3px var(--bg-overlay), 0 0 0 4px var(--accent-light);
-  transition: transform var(--t-base) var(--ease);
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--gold-400); color: var(--green-900);
+  font-family: var(--font-score); font-size: 0.72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; position: relative; z-index: 1;
+  box-shadow: 0 0 0 3px var(--bg-overlay), 0 0 0 5px rgba(201,160,58,0.35);
+  transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
 }
-.card:hover .stepBadge { transform: scale(1.08); }
-
-/* Vertical connector line */
-.stepRail::after {
-  content: '';
-  position: absolute;
-  top: calc(1.5rem + 28px + 6px);
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1px;
-  background: var(--border-score, var(--border-strong));
+.card:hover .stepBadge {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px var(--bg-overlay), 0 0 0 5px rgba(201,160,58,0.6);
 }
 /* Last card has no connector line */
 .card:last-of-type .stepRail::after { display: none; }

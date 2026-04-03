@@ -92,7 +92,7 @@
 .matchCard::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--gold), transparent 70%);
+  background: linear-gradient(90deg, var(--gold-400), var(--gold-300) 40%, transparent 80%);
 }
 
 .matchGrid {
@@ -192,13 +192,16 @@
 
 .confirmBtn {
   width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  background: var(--accent); color: var(--accent-text);
-  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500;
-  letter-spacing: 0.07em; text-transform: uppercase;
-  padding: 14px; border-radius: var(--radius-sm);
-  transition: background var(--t-base) var(--ease), transform var(--t-fast) var(--ease);
+  background: var(--gold-400); color: var(--green-900);
+  font-family: var(--font-score); font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 14px; border-radius: var(--radius-xs);
+  border: 1px solid var(--gold-500);
+  box-shadow: 0 4px 0 var(--gold-600), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all var(--t-fast) var(--ease);
 }
-.confirmBtn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.confirmBtn:hover { background: var(--gold-300); transform: translateY(-2px); box-shadow: 0 6px 0 var(--gold-600); }
+.confirmBtn:active { transform: translateY(2px); box-shadow: none; }
 
 /* ─── Wait card ──────────────────────────── */
 .waitCard {

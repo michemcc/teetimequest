@@ -61,27 +61,27 @@
   --gold-50:  #fdf6e3;
 
   /* ── Light mode tokens ── */
-  --bg-base:        #f7f4ee;   /* warm parchment — like a scorecard */
-  --bg-surface:     #fdfaf5;   /* slightly warmer white */
+  --bg-base:        #f5f2ea;   /* warm parchment */
+  --bg-surface:     #fdfaf3;   /* scorecard cream */
   --bg-raised:      #ffffff;
-  --bg-overlay:     #ede9e0;   /* sand overlay */
-  --bg-inset:       #e4dfd4;
-  --bg-scorecard:   #f9f6ef;   /* the scorecard surface */
+  --bg-overlay:     #ece7d8;   /* sand overlay */
+  --bg-inset:       #e2dccf;
+  --bg-scorecard:   #faf7ef;   /* scorecard surface */
 
-  --text-primary:   #1a1612;
-  --text-secondary: #4a4238;
-  --text-muted:     #8a7f72;
+  --text-primary:   #14110d;
+  --text-secondary: #3d3428;
+  --text-muted:     #7a6e60;
   --text-invert:    #fdfaf5;
 
-  --border:         rgba(42,33,24,0.10);
-  --border-strong:  rgba(42,33,24,0.18);
-  --border-accent:  rgba(42,33,24,0.30);
-  --border-score:   rgba(42,33,24,0.12);   /* scorecard ruled lines */
+  --border:         rgba(42,33,24,0.12);
+  --border-strong:  rgba(42,33,24,0.22);
+  --border-accent:  rgba(42,33,24,0.36);
+  --border-score:   rgba(42,33,24,0.15);   /* scorecard ruled lines */
 
-  --accent:         #2d5a3d;    /* deep fairway green */
-  --accent-mid:     #3d7552;
-  --accent-hover:   #1f3d28;
-  --accent-light:   #cde0d5;
+  --accent:         #235e35;    /* deep fairway green */
+  --accent-mid:     #2d7a45;
+  --accent-hover:   #184828;
+  --accent-light:   #b8dfc6;
   --accent-text:    #fdfaf5;
 
   --flag:           #b34444;    /* flag red */

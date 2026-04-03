@@ -140,120 +140,6 @@
 }
 [data-theme="dark"] .heroCard { background: var(--bg-raised); border-color: var(--border-strong); }
 
-/* Scorecard header stripe */
-.heroCardHeader {
-  background: var(--green-700);
-  padding: 10px 16px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 2px solid var(--gold-400);
-}
-[data-theme="dark"] .heroCardHeader { background: var(--bg-surface); border-bottom-color: var(--gold); }
-
-.heroCardHeaderLeft {
-  display: flex; align-items: center; gap: 8px;
-}
-.heroCardDot { width: 8px; height: 8px; border-radius: 50%; }
-.heroCardTitle {
-  font-family: var(--font-score);
-  font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--green-100);
-  margin-left: 4px;
-}
-[data-theme="dark"] .heroCardTitle { color: var(--text-muted); }
-
-.heroCardHole {
-  font-family: var(--font-score);
-  font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--gold-300);
-  background: rgba(0,0,0,0.2);
-  padding: 2px 8px; border-radius: var(--radius-xs);
-}
-[data-theme="dark"] .heroCardHole { color: var(--gold); background: var(--bg-overlay); }
-
-/* Scorecard stats row */
-.heroCardStats {
-  display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr;
-  align-items: center;
-  padding: 1.25rem;
-  border-bottom: 1px solid var(--border-score);
-  background: linear-gradient(to bottom, var(--bg-scorecard), var(--bg-surface));
-}
-[data-theme="dark"] .heroCardStats { background: var(--bg-raised); }
-
-.heroStatDivider { height: 32px; background: var(--border-score); }
-.heroStat { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.heroStatNum {
-  font-family: var(--font-score);
-  font-size: 2rem; font-weight: 700;
-  color: var(--text-primary); line-height: 1;
-  letter-spacing: -0.04em;
-}
-.heroStatLabel {
-  font-family: var(--font-score);
-  font-size: 0.52rem; color: var(--text-muted);
-  letter-spacing: 0.1em; text-transform: uppercase;
-  text-align: center;
-}
-
-/* Course row */
-.heroCardMatch {
-  display: flex; align-items: center; gap: 10px;
-  padding: 0.875rem 1rem;
-  border-bottom: 1px solid var(--border-score);
-}
-.heroCardMatchIcon { font-size: 1rem; flex-shrink: 0; }
-.heroCardMatchName {
-  font-family: var(--font-display); font-style: italic;
-  font-size: 0.9rem; color: var(--text-primary);
-}
-.heroCardMatchMeta {
-  font-family: var(--font-score);
-  font-size: 0.58rem; color: var(--text-muted);
-  margin-top: 2px; letter-spacing: 0.04em;
-}
-.heroCardMatchBadge {
-  margin-left: auto;
-  font-family: var(--font-score); font-size: 0.52rem; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  background: var(--flag-light); color: var(--flag);
-  padding: 3px 8px; border-radius: var(--radius-xs);
-  border: 1px solid var(--flag);
-  flex-shrink: 0;
-}
-
-/* Player avatars */
-.heroCardPlayers {
-  display: flex; align-items: center; gap: 0;
-  padding: 0.875rem 1rem;
-  background: var(--bg-overlay);
-}
-[data-theme="dark"] .heroCardPlayers { background: var(--bg-inset); }
-
-.heroAvatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--green-700); color: var(--green-100);
-  font-family: var(--font-score); font-size: 0.62rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid var(--bg-scorecard);
-  margin-left: -7px; position: relative;
-}
-[data-theme="dark"] .heroAvatar { background: var(--bg-inset); color: var(--text-secondary); border-color: var(--bg-raised); }
-.heroAvatar:first-child { margin-left: 0; }
-
-.heroAvatarDot {
-  position: absolute; bottom: -1px; right: -1px;
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--border-strong);
-  border: 1.5px solid var(--bg-scorecard);
-}
-[data-theme="dark"] .heroAvatarDot { border-color: var(--bg-raised); }
-.heroAvatarDot.green { background: var(--accent); }
-
-.heroPlayersLabel {
-  font-family: var(--font-score);
-  font-size: 0.6rem; color: var(--text-muted);
-  margin-left: 10px; letter-spacing: 0.04em;
-}
 
 /* ══════════════════════════════════════════
    SCORECARD STATS BAR
@@ -325,8 +211,8 @@
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  color: var(--text-primary); margin-bottom: 0.4rem;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  color: var(--text-primary); margin-bottom: 0.5rem;
 }
 .sectionDesc { font-size: 0.9rem; color: var(--text-secondary); }
 
@@ -355,16 +241,16 @@
 /* Hole number tab */
 .stepTop { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.1rem; }
 .stepNum {
-  font-family: var(--font-score); font-size: 0.58rem; font-weight: 700;
-  color: var(--green-900); background: var(--gold-400);
-  padding: 3px 8px; border-radius: 0; /* pixel square */
+  font-family: var(--font-score); font-size: 0.62rem; font-weight: 700;
+  color: #fff; background: var(--accent);
+  padding: 3px 9px; border-radius: 0;
   letter-spacing: 0.06em;
-  box-shadow: 2px 2px 0 var(--gold-600);
+  box-shadow: 2px 2px 0 var(--accent-hover);
 }
 [data-theme="dark"] .stepNum {
-  color: var(--green-950, #0f1f14);
-  background: var(--gold);
-  box-shadow: 2px 2px 0 var(--gold-600);
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
 }
 
 .stepIcon { font-size: 1.2rem; }
@@ -398,9 +284,15 @@
 [data-theme="dark"] .featCard { background: var(--bg-surface); }
 .featCard:hover { background: var(--bg-overlay); }
 
-.featCardAccent { border-top: 3px solid var(--flag); }
+.featCardAccent { border-top: 3px solid var(--gold-400); background: var(--gold-50, #fdf8ec); }
+[data-theme="dark"] .featCardAccent { background: var(--bg-overlay); border-top-color: var(--gold); }
 
-.featIcon { font-size: 1.3rem; margin-bottom: 0.75rem; display: block; line-height: 1; }
+.featIcon {
+  font-size: 1.6rem; margin-bottom: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: var(--radius-md);
+  background: var(--bg-overlay); line-height: 1;
+}
 .featTitle { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: var(--text-primary); margin-bottom: 0.4rem; }
 .featDesc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.65; }
 
@@ -491,4 +383,311 @@
 }
 @media (max-width: 400px) {
   .statsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SCORE CARD — Golf video game scoreboard widget
+   Sits in the hero. Looks like a real arcade leaderboard.
+══════════════════════════════════════════════════════════ */
+
+.scoreCard {
+  background: var(--navy-800);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(201,160,58,0.4),
+    0 0 0 3px var(--navy-800),
+    0 0 0 4px rgba(201,160,58,0.2),
+    0 24px 60px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .scoreCard {
+  background: var(--bg-surface);
+  box-shadow:
+    0 0 0 1px var(--gold),
+    0 0 0 3px var(--bg-surface),
+    0 0 0 4px rgba(201,160,58,0.15),
+    0 24px 60px rgba(0,0,0,0.6);
+}
+
+/* ── Title bar ─────────────────────────────── */
+.scoreCardTitle {
+  background: linear-gradient(135deg, var(--green-700) 0%, var(--green-800) 100%);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--gold-400);
+}
+[data-theme="dark"] .scoreCardTitle {
+  background: var(--bg-overlay);
+  border-bottom-color: var(--gold);
+}
+
+.scoreCardTitleText {
+  font-family: var(--font-score);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--gold-200);
+}
+[data-theme="dark"] .scoreCardTitleText { color: var(--gold); }
+
+.scoreCardLive {
+  font-family: var(--font-score);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #4ade80;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  display: inline-block;
+  box-shadow: 0 0 6px #4ade80;
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px #4ade80; }
+  50%       { opacity: 0.5; box-shadow: 0 0 2px #4ade80; }
+}
+
+/* ── Hole-style stat cells ─────────────────── */
+.scoreCardHoles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--navy-950, #0a0f1a);
+  border-bottom: 1px solid rgba(201,160,58,0.2);
+}
+[data-theme="dark"] .scoreCardHoles {
+  background: var(--bg-inset);
+  border-bottom-color: var(--border-strong);
+}
+
+.holeCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 1rem 0.5rem;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+}
+.holeCell:last-child { border-right: none; }
+[data-theme="dark"] .holeCell { border-right-color: var(--border); }
+
+.holeCellLabel {
+  font-family: var(--font-score);
+  font-size: 0.46rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.2;
+}
+[data-theme="dark"] .holeCellLabel { color: var(--text-muted); }
+
+/* The big score number — coloured by data attribute */
+.holeCellNum {
+  font-family: var(--font-score);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* Each stat gets its own arcade colour */
+.holeCellNum[data-color="gold"] {
+  color: var(--gold-300);
+  text-shadow: 0 0 16px rgba(217,184,90,0.6);
+}
+.holeCellNum[data-color="green"] {
+  color: #4ade80;
+  text-shadow: 0 0 16px rgba(74,222,128,0.5);
+}
+.holeCellNum[data-color="blue"] {
+  color: #60a5fa;
+  text-shadow: 0 0 16px rgba(96,165,250,0.5);
+}
+.holeCellNum[data-color="red"] {
+  color: #f87171;
+  text-shadow: 0 0 16px rgba(248,113,113,0.5);
+}
+
+.holeCellSub {
+  font-family: var(--font-score);
+  font-size: 0.48rem;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+}
+[data-theme="dark"] .holeCellSub { color: var(--text-muted); }
+
+/* ── Progress bar ──────────────────────────── */
+.scoreCardProgress {
+  padding: 0.75rem 1rem;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .scoreCardProgress {
+  background: var(--bg-raised);
+  border-bottom-color: var(--border);
+}
+
+.progressLabel {
+  font-family: var(--font-score);
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.35);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+[data-theme="dark"] .progressLabel { color: var(--text-muted); }
+
+.progressPct {
+  color: var(--gold-300);
+  font-weight: 700;
+}
+
+.progressTrack {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+[data-theme="dark"] .progressTrack { background: var(--bg-overlay); }
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-500), #4ade80);
+  border-radius: 99px;
+  box-shadow: 0 0 8px rgba(74,222,128,0.5);
+  transition: width 0.8s var(--ease);
+}
+
+/* ── Course match row ──────────────────────── */
+.scoreCardCourse {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  background: rgba(0,0,0,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .scoreCardCourse {
+  background: var(--bg-surface);
+  border-bottom-color: var(--border);
+}
+
+.courseFlag { font-size: 1.1rem; flex-shrink: 0; }
+
+.courseInfo { flex: 1; min-width: 0; }
+
+.courseName {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--sand-100);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-theme="dark"] .courseName { color: var(--text-primary); }
+
+.courseMeta {
+  font-family: var(--font-score);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.3);
+  margin-top: 2px;
+}
+[data-theme="dark"] .courseMeta { color: var(--text-muted); }
+
+.courseBadge {
+  font-family: var(--font-score);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  background: var(--flag);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  box-shadow: 0 0 10px rgba(179,68,68,0.5);
+  flex-shrink: 0;
+}
+
+/* ── Players row ───────────────────────────── */
+.scoreCardPlayers {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  background: rgba(0,0,0,0.25);
+}
+[data-theme="dark"] .scoreCardPlayers { background: var(--bg-inset); }
+
+.playerSlots { display: flex; gap: 5px; }
+
+.playerSlot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  font-family: var(--font-score);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all var(--t-base) var(--ease);
+}
+[data-theme="dark"] .playerSlot {
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
+  color: var(--text-muted);
+}
+
+.playerSlotDone {
+  background: var(--green-700);
+  border-color: #4ade80;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(74,222,128,0.3);
+}
+
+.playerCheck {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #4ade80;
+  color: #0a1a0a;
+  font-size: 0.45rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--navy-800);
+}
+[data-theme="dark"] .playerCheck { border-color: var(--bg-surface); }
+
+.playerStatus {
+  font-family: var(--font-score);
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #4ade80;
+  text-shadow: 0 0 8px rgba(74,222,128,0.4);
 }
