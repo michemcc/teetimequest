@@ -286,7 +286,7 @@ function _local_getRound(roundId) {
   return Promise.resolve(_ls_getAll()[roundId] || null)
 }
 
-function _local_createRound({
+async function _local_createRound({
   organizerName,
   organizerEmail,
   playerEmails,
@@ -320,7 +320,7 @@ function _local_createRound({
   return Promise.resolve(round)
 }
 
-function _local_saveAvailability(roundId, playerId, availability) {
+async function _local_saveAvailability(roundId, playerId, availability) {
   const all = _ls_getAll()
   const round = all[roundId]
   if (!round) return Promise.reject(new Error('Round not found'))
