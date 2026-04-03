@@ -51,15 +51,39 @@ export default function ResultsPage() {
     load()
   }, [roundId])
 
-  /* ── Realtime subscription (Supabase) — replaces 5s polling ── */
+  /* ── Realtime subscription — subscribe once, never resubscribe ── */
   useEffect(() => {
-    if (!round) return
+    // Subscribe as soon as round is loaded. Stable dep array = never torn down.
     const unsub = subscribeToRound(roundId, (updated) => {
       setRound(updated)
       if (updated.match?.confirmedCourse) setSelectedCourse(updated.match.confirmedCourse)
     })
     return unsub
-  }, [roundId, round?.status])
+  }, [roundId])  // intentionally omit round.status — resubscribing breaks the channel
+
+  /* ── Polling fallback — catches the match if realtime fires during a gap ──
+     When everyone has responded but match is still null (background job running),
+     poll every 3s until it arrives. Stops automatically once matched.        */
+  useEffect(() => {
+    if (!round) return
+    const allResponded = round.players.length > 0 &&
+      round.players.every(p => p.availability)
+    const matchPending = allResponded && !round.match
+
+    if (!matchPending) return  // nothing to poll for
+
+    const interval = setInterval(async () => {
+      try {
+        const fresh = await getRound(roundId)
+        if (fresh?.match) {
+          setRound(fresh)
+          clearInterval(interval)
+        }
+      } catch {}
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [roundId, round?.status, round?.match])
 
   /* ── Loading / not-found ── */
   if (loading) return (

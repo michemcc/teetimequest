@@ -227,20 +227,71 @@ async function _supabase_saveAvailability(roundId, playerId, availability) {
 
 /**
  * Background job: compute the match (slow — hits Nominatim + Overpass)
- * and save it to Supabase. ResultsPage realtime subscription picks it up.
+ * and save it to Supabase. ResultsPage polling fallback and realtime pick it up.
  */
 async function _computeAndSaveMatch(roundId, round) {
   try {
+    console.info('[match] Computing match for round', roundId, '...')
     const match  = await computeMatch(round)
     const status = match ? 'matched' : 'collecting'
-    await supabase
+
+    const { error } = await supabase
       .from('rounds')
       .update({ match, status })
       .eq('id', roundId)
-    console.info('[match] Computed and saved for round', roundId)
+
+    if (error) {
+      console.error('[match] Failed to save match:', error.message)
+    } else {
+      console.info('[match] Saved successfully for round', roundId,
+        '| courses:', match?.suggestedCourses?.length ?? 0)
+    }
   } catch (err) {
-    console.error('[match] Background match computation failed:', err.message)
+    console.error('[match] Background computation failed:', err.message)
+    // Save a minimal match with mock data so the page doesn't wait forever
+    try {
+      const fallbackMatch = computeMatchSync(round)
+      await supabase
+        .from('rounds')
+        .update({ match: fallbackMatch, status: 'matched' })
+        .eq('id', roundId)
+      console.info('[match] Saved fallback match for round', roundId)
+    } catch (fallbackErr) {
+      console.error('[match] Fallback also failed:', fallbackErr.message)
+    }
   }
+}
+
+/** Synchronous fallback match using only mock courses — no network calls */
+function computeMatchSync(round) {
+  const dateSets = round.players
+    .filter(p => p.availability?.dates?.length)
+    .map(p => new Set(p.availability.dates))
+  if (!dateSets.length) return null
+
+  let common = [...dateSets[0]]
+  for (let i = 1; i < dateSets.length; i++) common = common.filter(d => dateSets[i].has(d))
+  if (!common.length) {
+    const counts = {}
+    round.players.forEach(p => p.availability?.dates?.forEach(d => { counts[d] = (counts[d]||0)+1 }))
+    const best = Object.entries(counts).sort((a,b) => b[1]-a[1])[0]
+    if (!best) return null
+    common = [best[0]]
+  }
+  common.sort()
+
+  const prefCounts = {}
+  round.players.forEach(p => (p.availability?.timePreferences||[]).forEach(tp => { prefCounts[tp]=(prefCounts[tp]||0)+1 }))
+  const topPref = Object.entries(prefCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || 'morning'
+  const teeTimeMap = { early:['7:00 AM','7:30 AM'], morning:['8:00 AM','8:30 AM','9:00 AM'], midday:['10:00 AM','11:00 AM'], afternoon:['12:00 PM','1:00 PM','2:00 PM'] }
+  const candidates = teeTimeMap[topPref] || ['8:30 AM']
+  const teeTime = candidates[Math.floor(Math.random() * candidates.length)]
+
+  const shuffled = [...MOCK_COURSES].sort(() => (round.id.charCodeAt(0) % 2 === 0 ? 1 : -1))
+  const storyline = generateStoryline(round, common[0], teeTime, shuffled[0])
+
+  return { date: common[0], teeTime, commonDatesCount: common.length,
+           suggestedCourses: shuffled.slice(0,3), confirmedCourse: null, storyline }
 }
 
 /* ── Shape normaliser ── DB uses snake_case; app expects camelCase ── */
