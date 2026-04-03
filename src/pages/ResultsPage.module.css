@@ -77,10 +77,10 @@
 
 /* ─── Match card ─────────────────────────── */
 .matchCard {
-  background: var(--ink-900);
+  background: var(--neutral-900, #18181b);
   border-radius: var(--radius-lg);
   padding: 1.5rem 1.75rem;
-  color: var(--cream-50);
+  color: var(--neutral-50, #fafafa);
   position: relative; overflow: hidden;
 }
 [data-theme="dark"] .matchCard {

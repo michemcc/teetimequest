@@ -43,7 +43,7 @@
   background: var(--bg-surface); padding: 2rem;
   transition: background var(--t-base) var(--ease);
 }
-.card:hover { background: var(--cream-100); }
+.card:hover { background: var(--bg-overlay); }
 [data-theme="dark"] .card:hover { background: var(--bg-overlay); }
 
 .cardIcon { font-size: 1.4rem; display: block; margin-bottom: 0.75rem; }
@@ -144,7 +144,7 @@
   background: var(--bg-surface); transition: background var(--t-base) var(--ease);
 }
 .policySection:last-child { border-bottom: none; }
-.policySection:hover { background: var(--cream-100); }
+.policySection:hover { background: var(--bg-overlay); }
 [data-theme="dark"] .policySection:hover { background: var(--bg-overlay); }
 
 .policySectionTitle { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: var(--text-primary); margin-bottom: 0.6rem; }

@@ -384,12 +384,12 @@ function computeMatch(round) {
   const topPref = Object.entries(prefCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'morning'
 
   const teeTimeMap = {
-    early:     ['7:00 AM', '7:30 AM'],
-    morning:   ['8:00 AM', '8:30 AM', '9:00 AM'],
-    midday:    ['10:00 AM', '11:00 AM'],
-    afternoon: ['1:00 PM', '2:00 PM', '3:00 PM'],
+    early:     ['6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM'],
+    morning:   ['8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM'],
+    midday:    ['10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'],
+    afternoon: ['12:00 PM', '12:30 PM', '1:00 PM', '2:00 PM', '3:00 PM'],
   }
-  const candidates = teeTimeMap[topPref] || ['8:00 AM', '8:30 AM']
+  const candidates = teeTimeMap[topPref] || ['8:00 AM', '8:30 AM', '9:00 AM']
   const teeTime = candidates[Math.floor(Math.random() * candidates.length)]
 
   const shuffled = [...MOCK_COURSES].sort(() => (round.id.charCodeAt(0) % 2 === 0 ? 1 : -1))

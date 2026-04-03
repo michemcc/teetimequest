@@ -138,8 +138,8 @@
 /* ══════════════════════════════════════════
    STATS BAR
 ══════════════════════════════════════════ */
-.statsBar { background: var(--forest-900); }
-[data-theme="dark"] .statsBar { background: var(--bg-overlay); border-bottom: 1px solid var(--border); }
+.statsBar { background: var(--neutral-900, #18181b); }
+[data-theme="dark"] .statsBar { background: var(--bg-raised); border-bottom: 1px solid var(--border-strong); }
 
 .statsGrid { display: grid; grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 560px) { .statsGrid { grid-template-columns: repeat(2,1fr); } }
@@ -168,7 +168,7 @@
 ══════════════════════════════════════════ */
 .section { padding: 96px 0; }
 .sectionAlt {
-  background: var(--cream-100);
+  background: var(--bg-overlay);
   border-top: 1px solid var(--border-strong);
   border-bottom: 1px solid var(--border-strong);
 }
@@ -244,7 +244,7 @@
   transition: background var(--t-base) var(--ease);
   position: relative;
 }
-.featCard:hover { background: var(--cream-100); }
+.featCard:hover { background: var(--bg-overlay); }
 [data-theme="dark"] .featCard:hover { background: var(--bg-overlay); }
 /* First card gets gold top accent */
 .featCardAccent { border-top: 3px solid var(--gold); }
@@ -257,7 +257,7 @@
    CTA BAND
 ══════════════════════════════════════════ */
 .ctaBand {
-  background: var(--forest-900);
+  background: var(--neutral-900, #18181b);
   padding: 96px 0;
   position: relative; overflow: hidden;
 }

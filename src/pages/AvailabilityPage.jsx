@@ -8,10 +8,10 @@ import { getNextNDays, formatDate, groupByMonth } from '../utils/dates'
 import styles from './AvailabilityPage.module.css'
 
 const TIME_PREFS = [
-  { id: 'early',     label: 'Early bird', desc: '7:00–7:30 AM' },
-  { id: 'morning',   label: 'Morning',    desc: '8:00–9:30 AM' },
-  { id: 'midday',    label: 'Midday',     desc: '10 AM–12 PM'  },
-  { id: 'afternoon', label: 'Afternoon',  desc: '1:00–4:00 PM' },
+  { id: 'early',     label: 'Early bird', desc: '6:00–8:00 AM'  },
+  { id: 'morning',   label: 'Morning',    desc: '8:00–10:00 AM' },
+  { id: 'midday',    label: 'Midday',     desc: '10:00 AM–12 PM'},
+  { id: 'afternoon', label: 'Afternoon',  desc: '12:00–4:00 PM' },
 ]
 
 export default function AvailabilityPage() {
