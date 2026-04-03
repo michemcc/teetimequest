@@ -1,98 +1,122 @@
-/* ══════════════════════════════════════════════════════════
-   TeeTimeQuest — Design System v2026.2.0
-   Enterprise × Contemporary. Slate + Forest + Gold.
-   Mobile-first. No horizontal overflow. App-shell pattern.
-══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   TeeTimeQuest — Design System v2026.2.1
+   Golf Arcade × Professional. Sleek scorecard aesthetic.
+   Fairway green + sand cream + flag red + navy.
+   Muted, high-contrast, characterful.
+══════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Core palette ── */
-  --slate-950: #0a0f0d;
-  --slate-900: #111815;
-  --slate-850: #16201c;
-  --slate-800: #1c2b24;
-  --slate-700: #253626;  /* slightly warm dark green */
-  --slate-600: #344d3a;
-  --slate-500: #4a6b52;
-  --slate-400: #6a8f72;
-  --slate-300: #93b49a;
-  --slate-200: #c0d6c4;
-  --slate-100: #e4eee6;
-  --slate-50:  #f2f7f3;
+  /* ── Golf palette ── */
 
-  --gold-700: #7a5515;
-  --gold-600: #9e7020;
-  --gold-500: #c49030;
-  --gold-400: #d4a843;
-  --gold-300: #e0c070;
-  --gold-200: #ebd4a0;
-  --gold-100: #f6eccc;
-  --gold-50:  #fdf8ec;
+  /* Fairway greens — muted, earthy, not neon */
+  --green-950: #0f1f14;
+  --green-900: #162b1d;
+  --green-800: #1f3d28;
+  --green-700: #2d5a3d;
+  --green-600: #3d7552;
+  --green-500: #5c8a6a;  /* primary accent — muted fairway */
+  --green-400: #7faa8d;
+  --green-300: #a8c8b3;
+  --green-200: #cde0d5;
+  --green-100: #e4f0e8;
+  --green-50:  #f2f8f4;
 
-  --neutral-950: #09090b;
-  --neutral-900: #18181b;
-  --neutral-800: #27272a;
-  --neutral-700: #3f3f46;
-  --neutral-600: #52525b;
-  --neutral-500: #71717a;
-  --neutral-400: #a1a1aa;
-  --neutral-300: #d4d4d8;
-  --neutral-200: #e4e4e7;
-  --neutral-100: #f4f4f5;
-  --neutral-50:  #fafafa;
+  /* Sand & parchment — scorecard paper */
+  --sand-950: #2a2118;
+  --sand-900: #3d3020;
+  --sand-800: #5a4730;
+  --sand-700: #7a6145;
+  --sand-600: #9c7f5e;
+  --sand-500: #b8997a;
+  --sand-400: #ccb595;
+  --sand-300: #decdad;
+  --sand-200: #ece2ce;
+  --sand-100: #f4ede0;
+  --sand-50:  #faf6ef;
 
-  /* ── Light mode semantic tokens ── */
-  --bg-base:        #f8f9fa;
-  --bg-surface:     #ffffff;
+  /* Flag red — birdie indicator */
+  --red-700: #8b2020;
+  --red-600: #a83030;
+  --red-500: #b34444;
+  --red-400: #cc6666;
+  --red-300: #e09090;
+
+  /* Navy — deep rough */
+  --navy-950: #0a0f1a;
+  --navy-900: #111829;
+  --navy-800: #1c2d3f;
+  --navy-700: #253a54;
+  --navy-600: #2e4a6a;
+  --navy-500: #3d5f82;
+  --navy-400: #5a7ea0;
+
+  /* Scorecard gold */
+  --gold-700: #6b4c0f;
+  --gold-600: #8a6318;
+  --gold-500: #a87e28;
+  --gold-400: #c9a03a;
+  --gold-300: #d9b85a;
+  --gold-200: #eacf8a;
+  --gold-100: #f5e9c0;
+  --gold-50:  #fdf6e3;
+
+  /* ── Light mode tokens ── */
+  --bg-base:        #f7f4ee;   /* warm parchment — like a scorecard */
+  --bg-surface:     #fdfaf5;   /* slightly warmer white */
   --bg-raised:      #ffffff;
-  --bg-overlay:     #f1f3f4;
-  --bg-inset:       #e8eaec;
-  --text-primary:   #111827;
-  --text-secondary: #4b5563;
-  --text-muted:     #9ca3af;
-  --text-invert:    #ffffff;
-  --border:         rgba(17,24,39,0.08);
-  --border-strong:  rgba(17,24,39,0.14);
-  --border-accent:  rgba(17,24,39,0.24);
+  --bg-overlay:     #ede9e0;   /* sand overlay */
+  --bg-inset:       #e4dfd4;
+  --bg-scorecard:   #f9f6ef;   /* the scorecard surface */
 
-  /* ── Brand accent — forest green ── */
-  --accent:         #1a5c2e;
-  --accent-mid:     #22703a;
-  --accent-hover:   #145225;
-  --accent-light:   #d1fae5;
-  --accent-text:    #ffffff;
+  --text-primary:   #1a1612;
+  --text-secondary: #4a4238;
+  --text-muted:     #8a7f72;
+  --text-invert:    #fdfaf5;
 
-  /* ── Gold — earned feel ── */
-  --gold:           #c49030;
-  --gold-bg:        #fdf8ec;
+  --border:         rgba(42,33,24,0.10);
+  --border-strong:  rgba(42,33,24,0.18);
+  --border-accent:  rgba(42,33,24,0.30);
+  --border-score:   rgba(42,33,24,0.12);   /* scorecard ruled lines */
 
-  /* ── Status ── */
-  --success:        #16a34a;
-  --success-bg:     #f0fdf4;
-  --warning:        #d97706;
-  --warning-bg:     #fffbeb;
-  --danger:         #dc2626;
-  --danger-bg:      #fef2f2;
+  --accent:         #2d5a3d;    /* deep fairway green */
+  --accent-mid:     #3d7552;
+  --accent-hover:   #1f3d28;
+  --accent-light:   #cde0d5;
+  --accent-text:    #fdfaf5;
+
+  --flag:           #b34444;    /* flag red */
+  --flag-light:     rgba(179,68,68,0.10);
+
+  --gold:           #a87e28;
+  --gold-bg:        #f5e9c0;
+
+  --success:        #2d7a4a;
+  --success-bg:     #e8f5ed;
+  --warning:        #a87e28;
+  --warning-bg:     #fdf6e3;
+  --danger:         #b34444;
+  --danger-bg:      #faeaea;
 
   /* ── Typography ── */
-  --font-display: 'DM Serif Display', Georgia, serif;
-  --font-body:    'Outfit', system-ui, -apple-system, sans-serif;
-  --font-mono:    'DM Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+  --font-body:    'Outfit', system-ui, sans-serif;
+  --font-score:   'Space Mono', 'Courier New', monospace;  /* scoreboard numbers */
 
-  /* ── Radii — enterprise = precise, not bubbly ── */
-  --radius-xs:   2px;
-  --radius-sm:   4px;
-  --radius-md:   8px;
-  --radius-lg:   10px;
-  --radius-xl:   14px;
-  --radius-2xl:  20px;
+  /* ── Radii — scorecard = square-ish, not bubbly ── */
+  --radius-xs:   1px;
+  --radius-sm:   3px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-2xl:  18px;
   --radius-full: 9999px;
 
-  /* ── Shadows — subtle, not dramatic ── */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.03);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03);
-  --shadow-lg: 0 10px 36px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04);
-  --shadow-xl: 0 20px 64px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(42,33,24,0.06);
+  --shadow-sm: 0 2px 6px rgba(42,33,24,0.09), 0 0 0 1px rgba(42,33,24,0.04);
+  --shadow-md: 0 4px 16px rgba(42,33,24,0.10), 0 0 0 1px rgba(42,33,24,0.05);
+  --shadow-lg: 0 10px 32px rgba(42,33,24,0.12), 0 0 0 1px rgba(42,33,24,0.06);
+  --shadow-xl: 0 20px 60px rgba(42,33,24,0.14), 0 0 0 1px rgba(42,33,24,0.07);
 
   /* ── Motion ── */
   --ease:     cubic-bezier(0.4, 0, 0.2, 1);
@@ -102,42 +126,49 @@
   --t-slow: 280ms;
 }
 
-/* ── Dark mode — rich midnight green ─────────── */
+/* ── Dark mode — deep clubhouse night ─────────────────── */
 [data-theme="dark"] {
-  /* Backgrounds: deep forest midnight, not cold grey */
-  --bg-base:        #0d1210;
-  --bg-surface:     #131a16;
-  --bg-raised:      #192118;
-  --bg-overlay:     #1e281f;
-  --bg-inset:       #253027;
+  /* The 19th hole — dark wood panelling, low light */
+  --bg-base:        #0f130e;
+  --bg-surface:     #151c14;
+  --bg-raised:      #1b2419;
+  --bg-overlay:     #202c1e;
+  --bg-inset:       #283524;
+  --bg-scorecard:   #192118;
 
-  /* Text: warm white, not icy */
-  --text-primary:   #eef2ee;
-  --text-secondary: #8fa898;
-  --text-muted:     #4d6355;
+  --text-primary:   #edeae2;
+  --text-secondary: #9aab94;
+  --text-muted:     #506048;
 
-  /* Borders: subtly tinted green */
-  --border:         rgba(180,220,190,0.07);
-  --border-strong:  rgba(180,220,190,0.12);
-  --border-accent:  rgba(180,220,190,0.22);
+  --border:         rgba(200,220,200,0.07);
+  --border-strong:  rgba(200,220,200,0.12);
+  --border-accent:  rgba(200,220,200,0.22);
+  --border-score:   rgba(200,220,200,0.10);
 
-  /* Accent: bright spring green — vivid on dark */
-  --accent:         #3dd68c;
-  --accent-mid:     #22c55e;
-  --accent-hover:   #5de6a4;
-  --accent-light:   rgba(61,214,140,0.14);
-  --accent-text:    #071209;
+  --accent:         #5c8a6a;
+  --accent-mid:     #4a7558;
+  --accent-hover:   #7faa8d;
+  --accent-light:   rgba(92,138,106,0.18);
+  --accent-text:    #0f130e;
 
-  /* Gold: warm amber */
-  --gold:           #e0b84a;
-  --gold-bg:        rgba(224,184,74,0.12);
+  --flag:           #cc6666;
+  --flag-light:     rgba(204,102,102,0.14);
 
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.45);
-  --shadow-sm: 0 2px 6px rgba(0,0,0,0.5),  0 0 0 1px rgba(180,220,190,0.05);
-  --shadow-md: 0 4px 18px rgba(0,0,0,0.55), 0 0 0 1px rgba(180,220,190,0.06);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(180,220,190,0.07);
-  --shadow-xl: 0 24px 72px rgba(0,0,0,0.65),0 0 0 1px rgba(180,220,190,0.07);
+  --gold:           #c9a03a;
+  --gold-bg:        rgba(201,160,58,0.12);
+
+  --success:        #5c8a6a;
+  --success-bg:     rgba(92,138,106,0.12);
+  --warning:        #c9a03a;
+  --warning-bg:     rgba(201,160,58,0.12);
+  --danger:         #cc6666;
+  --danger-bg:      rgba(204,102,102,0.12);
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,220,200,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.6), 0 0 0 1px rgba(200,220,200,0.05);
+  --shadow-lg: 0 10px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(200,220,200,0.06);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,220,200,0.06);
 }
 
 /* ── Reset ─────────────────────────────────── */
@@ -163,9 +194,31 @@ body {
   width: 100%;
   max-width: 100vw;
   transition: background var(--t-slow) var(--ease), color var(--t-slow) var(--ease);
+  /* Subtle fairway diagonal stripe texture */
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 40px,
+    rgba(45,90,61,0.018) 40px,
+    rgba(45,90,61,0.018) 41px
+  );
+}
+[data-theme="dark"] body {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 40px,
+    rgba(92,138,106,0.04) 40px,
+    rgba(92,138,106,0.04) 41px
+  );
 }
 
-h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.1; letter-spacing: -0.01em; }
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; font-family: var(--font-body); border: none; background: none; }
 input, textarea { font-family: var(--font-body); color: var(--text-primary); }
@@ -181,7 +234,6 @@ img { max-width: 100%; display: block; }
 }
 @media (max-width: 600px) { .container { padding: 0 1rem; } }
 @media (max-width: 380px) { .container { padding: 0 0.875rem; } }
-
 .container--narrow { max-width: 760px; }
 .container--xs     { max-width: 560px; }
 
@@ -195,8 +247,8 @@ img { max-width: 100%; display: block; }
 /* ── Scrollbar ───────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg-overlay); }
-::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+::-webkit-scrollbar-thumb { background: var(--accent-light); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 /* ── Selection ───────────────────────────────── */
 ::selection { background: var(--accent-light); color: var(--text-primary); }

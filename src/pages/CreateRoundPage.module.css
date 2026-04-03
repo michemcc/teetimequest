@@ -18,8 +18,8 @@
 .headerBadge {
   font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500;
   letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-muted); background: var(--bg-overlay);
-  border: 1px solid var(--border-strong);
+  color: var(--text-muted); background: var(--bg-scorecard, var(--bg-overlay));
+  border: 1px solid var(--border-score, var(--border-strong));
   padding: 3px 8px; border-radius: var(--radius-sm);
 }
 
@@ -105,7 +105,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 1px;
-  background: var(--border-strong);
+  background: var(--border-score, var(--border-strong));
 }
 /* Last card has no connector line */
 .card:last-of-type .stepRail::after { display: none; }
@@ -178,7 +178,7 @@
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   transition: all var(--t-base) var(--ease);
 }
-.removeBtn:hover { background: var(--danger-bg); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+.removeBtn:hover { background: var(--danger-bg, #faeaea); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
 
 .addBtn {
   margin-top: 10px; display: inline-flex; align-items: center; gap: 6px;
@@ -225,7 +225,7 @@
 /* ─── Error / Submit ────────────────────────────── */
 .error {
   display: flex; align-items: flex-start; gap: 8px;
-  background: var(--danger-bg);
+  background: var(--danger-bg, #faeaea);
   border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
   border-left: 3px solid var(--danger);
   color: var(--danger); border-radius: var(--radius-sm);

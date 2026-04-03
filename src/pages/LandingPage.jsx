@@ -83,12 +83,12 @@ export default function LandingPage() {
       <div className={styles.statsBar}>
         <div className={`container ${styles.statsGrid}`}>
           {[
-            {num:'2–8', label:'players per round'},
-            {num:'60s', label:'to set up'},
-            {num:'0',   label:'accounts needed'},
-            {num:'Free',label:'always'},
+            {num:'2–8', label:'players per round', hole:'H1'},
+            {num:'60s', label:'to set up',         hole:'H2'},
+            {num:'0',   label:'accounts needed',   hole:'H3'},
+            {num:'Free',label:'always',             hole:'H4'},
           ].map(s => (
-            <div key={s.label} className={styles.statCell}>
+            <div key={s.label} className={styles.statCell} data-hole={s.hole}>
               <span className={styles.statNum}>{s.num}</span>
               <span className={styles.statLabel}>{s.label}</span>
             </div>
