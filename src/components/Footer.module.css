@@ -188,3 +188,11 @@
   .dot { display: none; }
   .copy, .bottomLink { font-size: 0.64rem; }
 }
+
+.version {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--border-accent);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}

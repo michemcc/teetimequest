@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import styles from './Footer.module.css'
 
+const VERSION = '2026.2.0'
+
 export default function Footer() {
   return (
     <footer className={styles.footer}>
@@ -51,6 +53,8 @@ export default function Footer() {
       {/* ── Bottom bar ── single flex row, always centered ── */}
       <div className={styles.bottom}>
         <span className={styles.copy}>© {new Date().getFullYear()} TeeTimeQuest</span>
+        <span className={styles.dot} aria-hidden="true">·</span>
+        <span className={styles.version}>v{VERSION}</span>
         <span className={styles.dot} aria-hidden="true">·</span>
         <Link to="/privacy" className={styles.bottomLink}>Privacy</Link>
         <span className={styles.dot} aria-hidden="true">·</span>
