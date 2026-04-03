@@ -133,7 +133,7 @@ async function _supabase_createRound({
   const allResponded = round.players.every(p => p.availability)
 
   if (allResponded) {
-    const match = computeMatch(round)
+    const match = await computeMatch(round)
     const status = match ? 'matched' : 'collecting'
     await supabase
       .from('rounds')
@@ -185,7 +185,7 @@ async function _supabase_saveAvailability(roundId, playerId, availability) {
   const allResponded = round.players.every(p => p.availability)
 
   if (allResponded) {
-    const match = computeMatch(round)
+    const match = await computeMatch(round)
     const status = match ? 'matched' : 'collecting'
     const { error: matchError } = await supabase
       .from('rounds')
