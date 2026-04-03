@@ -67,9 +67,9 @@
   --radius-xs:   2px;
   --radius-sm:   6px;
   --radius-md:   10px;
-  --radius-lg:   14px;
-  --radius-xl:   20px;
-  --radius-2xl:  28px;
+  --radius-lg:   12px;
+  --radius-xl:   18px;
+  --radius-2xl:  24px;
   --radius-full: 9999px;
 
   /* ── Shadows ── */
@@ -203,4 +203,16 @@ img { max-width: 100%; display: block; }
     margin-right: -1rem;
     border-radius: 0;
   }
+}
+
+/* ── App shell ───────────────────────────────────────────
+   Every page: flex column, nav sticky top, footer anchors bottom.
+   Content zone uses pageInner (not .container) for padding control.
+   This ensures nothing ever touches nav or footer.
+─────────────────────────────────────────────────────── */
+.appPage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
 }

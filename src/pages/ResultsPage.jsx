@@ -74,7 +74,7 @@ export default function ResultsPage() {
 
   if (notFound) return (
     <div className={styles.page}><Nav />
-      <div className={`container container--xs ${styles.content}`}>
+      <div className={styles.pageInner}>
         <div className={styles.notFound}>
           <div>⛳</div><h1>Round not found</h1>
           <p>This round doesn't exist. <button onClick={() => navigate('/create')}>Start a new one →</button></p>
@@ -91,7 +91,7 @@ export default function ResultsPage() {
   return (
     <div className={styles.page}>
       <Nav />
-      <div className={`container ${styles.content}`}>
+      <div className={styles.pageInner}>
 
         {/* Header */}
         <div className={styles.header}>
