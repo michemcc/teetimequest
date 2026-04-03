@@ -78,6 +78,8 @@ export default function AvailabilityPage() {
     if (!location.trim())      return setError('Enter your starting location.')
     if (timePref.size === 0)   return setError('Choose at least one preferred tee time.')
 
+    // Scroll to top immediately so success banner is visible — don't wait for async save
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     setSaving(true)
     try {
       // Update name if it changed
@@ -96,7 +98,6 @@ export default function AvailabilityPage() {
       setSubmitted(true)
       setEditing(false)
       setRound(updated)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
       setError('Something went wrong. Please try again.')
       console.error(err)

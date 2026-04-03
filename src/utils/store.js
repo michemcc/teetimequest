@@ -443,15 +443,28 @@ function generateStoryline(round, date, teeTime, topCourse) {
     dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   } catch {}
 
+  // Use the course's city if available (e.g. "Rehoboth, MA"), not the organizer's city.
+  // Course address is typically "123 Main St, Rehoboth, MA" — take last two comma-parts.
+  let city = round.city  // fallback
+  if (topCourse?.address) {
+    const parts = topCourse.address.split(',').map(s => s.trim()).filter(Boolean)
+    if (parts.length >= 2) {
+      // Last two parts are typically "City, STATE" or just "City"
+      city = parts.slice(-2).join(', ')
+    } else if (parts.length === 1) {
+      city = parts[0]
+    }
+  }
+
   const ctx = {
     names,
-    city:    round.city,
+    city,
     date:    dateStr,
     teeTime,
     course:  topCourse?.name || null,
   }
 
-  // Pick a random opener and format, seeded loosely by round ID for consistency
+  // Pick opener and format seeded by round ID so same round = same story
   const seed    = round.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
   const opener  = OPENERS[seed % OPENERS.length]
   const format  = FORMATS[(seed + 3) % FORMATS.length]

@@ -187,20 +187,35 @@ export async function findCoursesNearPlayers(players, fallbackCity, limit = 5) {
   if (!elements.length) return null
 
   // Keywords strongly associated with private/members-only clubs
-  const PRIVATE_KEYWORDS = [
-    'country club', 'cc', 'yacht', 'hunt club', 'polo',
-    'private', 'members only', 'athletic club',
+  // Names that strongly indicate private/members-only clubs
+  const PRIVATE_NAME_KEYWORDS = [
+    'country club', 'yacht club', 'hunt club', 'polo club',
+    'athletic club', 'tennis club', 'swim club', 'racquet',
+    'members only', 'private club',
   ]
+
+  // Words that on their own suggest private (only when paired with 'club' context)
+  const PRIVATE_STANDALONE = [
+    ' club',    // "Bear Hill Club", "Meadow Brook Club"  — note leading space
+  ]
+
+  // OSM access values that mean non-public
+  const PRIVATE_ACCESS = ['private', 'members', 'permissive', 'no', 'restricted']
 
   const courses = elements
     .map(el => normalise(el, center.lat, center.lng))
     .filter(c => c.name)
-    // Filter out courses explicitly tagged private or members-only
-    .filter(c => !['private', 'members', 'permissive'].includes(c.access?.toLowerCase()))
-    // Filter out courses whose names strongly suggest private membership
+    // OSM access tag — most reliable signal
+    .filter(c => !PRIVATE_ACCESS.includes(c.access?.toLowerCase()))
+    // Name-based heuristics
     .filter(c => {
       const lower = c.name.toLowerCase()
-      return !PRIVATE_KEYWORDS.some(kw => lower.includes(kw))
+      // Explicit phrase matches
+      if (PRIVATE_NAME_KEYWORDS.some(kw => lower.includes(kw))) return false
+      // " club" suffix (e.g. "Bear Hill Club", "Meadow Brook Club")
+      // but allow "golf club" which is often public (e.g. "Foxborough Golf Club")
+      if (lower.endsWith(' club') && !lower.includes('golf club') && !lower.includes('disc club')) return false
+      return true
     })
     .sort((a, b) => parseFloat(a.distanceMi ?? 999) - parseFloat(b.distanceMi ?? 999))
     .filter((c, i, arr) => arr.findIndex(x => x.name === c.name) === i)    // deduplicate
