@@ -17,7 +17,7 @@
 
 import { nanoid } from 'nanoid'
 import { supabase } from './supabase'
-import { findCoursesNearCity } from './courses'
+import { findCoursesNearPlayers } from './courses'
 
 /* ─── Backend detection ─────────────────────────────────────────────────── */
 
@@ -467,7 +467,7 @@ async function computeMatch(round) {
   /* ── Real course discovery via OpenStreetMap ── */
   let suggestedCourses = null
   try {
-    suggestedCourses = await findCoursesNearCity(round.city, 5)
+    suggestedCourses = await findCoursesNearPlayers(round.players, round.city, 5)
   } catch (err) {
     console.warn('[courses] OSM lookup failed, falling back to mock:', err.message)
   }

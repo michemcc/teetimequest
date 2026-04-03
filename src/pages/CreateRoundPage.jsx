@@ -98,7 +98,7 @@ export default function CreateRoundPage() {
             </div>
             <h1 className={styles.title}>Set up your group</h1>
             <p className={styles.subtitle}>
-              Works for 2–8 players. Each person gets a private invite link, no account needed.
+              Works for 2–8 players. Enter emails below and everyone gets their own private link. No app, no login.
             </p>
           </header>
 
@@ -152,7 +152,7 @@ export default function CreateRoundPage() {
                   <span className={styles.cardTitle}>Other players</span>
                   <span className={styles.playerBadge}>{totalPlayers} / 8</span>
                 </div>
-                <p className={styles.cardDesc}>Each person receives a unique invite link.</p>
+                <p className={styles.cardDesc}>We email everyone a private link to mark their availability. Add as many as you need.</p>
                 <div className={styles.playerList}>
                   {players.map((email, i) => (
                     <div key={i} className={styles.playerRow}>
@@ -188,7 +188,7 @@ export default function CreateRoundPage() {
                   {selectedDates.size > 0 && <span className={styles.playerBadge}>{selectedDates.size} dates</span>}
                 </div>
                 <p className={styles.cardDesc}>
-                  Your entry is pre-submitted. No need to visit your own link later.
+                  Pick your own dates here, you're all set. No need to click your invite link.
                 </p>
 
                 {Object.entries(monthGroups).map(([month, mdates]) => (

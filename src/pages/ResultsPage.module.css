@@ -72,6 +72,7 @@
   align-items: start;
 }
 @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .card { padding: 1rem; } .matchCard { padding: 1.25rem; } }
 
 .leftCol, .rightCol { display: flex; flex-direction: column; gap: 1rem; }
 
@@ -233,9 +234,10 @@
 .playerList { display: flex; flex-direction: column; }
 
 .playerRow {
-  display: grid; grid-template-columns: 32px 1fr 30px;
+  display: grid; grid-template-columns: 36px 1fr 36px;
   align-items: center; gap: 10px;
-  padding: 8px 4px; border-radius: var(--radius-sm);
+  padding: 10px 6px; border-radius: var(--radius-sm);
+  min-height: 52px; /* comfortable tap target */
   transition: background var(--t-fast) var(--ease);
 }
 .playerRow:hover { background: var(--bg-overlay); }
@@ -262,7 +264,7 @@
 .playerEmail { font-size: 0.68rem; color: var(--text-muted); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .linkBtn {
-  width: 28px; height: 28px; border-radius: var(--radius-xs);
+  width: 36px; height: 36px; border-radius: var(--radius-xs);
   background: var(--bg-overlay); border: 1px solid var(--border);
   color: var(--text-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   transition: all var(--t-base) var(--ease);

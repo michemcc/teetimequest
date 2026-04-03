@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme.jsx'
 import styles from './Nav.module.css'
 
-const VERSION = '2026.2.2'
+const VERSION = '2026.2.3'
 
 export default function Nav() {
   const { theme, toggle } = useTheme()

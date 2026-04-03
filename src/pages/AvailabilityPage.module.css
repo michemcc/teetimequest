@@ -116,14 +116,15 @@
   font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500;
   letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
 }
-.dateGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(114px, 1fr)); gap: 5px; }
+.dateGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px; }
 
 .dateBtn {
   touch-action: manipulation;
-  padding: 9px 10px;
+  padding: 11px 8px;
   border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
   font-size: 0.78rem; font-weight: 400; color: var(--text-secondary);
-  background: var(--bg-base); text-align: left;
+  background: var(--bg-base); text-align: center;
+  min-height: 44px; /* Apple HIG minimum tap target */
   transition: all var(--t-base) var(--ease); cursor: pointer;
 }
 .dateBtn:hover { border-color: var(--accent); color: var(--text-primary); background: var(--bg-surface); }
@@ -135,9 +136,10 @@
 
 .timeBtn {
   touch-action: manipulation;
-  padding: 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  padding: 14px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
   background: var(--bg-base); text-align: left;
-  display: flex; flex-direction: column; gap: 3px;
+  display: flex; flex-direction: column; gap: 4px;
+  min-height: 64px; /* roomier tap target */
   transition: all var(--t-base) var(--ease); cursor: pointer; position: relative;
 }
 .timeBtn:hover { border-color: var(--accent); background: var(--bg-surface); }
@@ -169,7 +171,8 @@
   font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500;
   letter-spacing: 0.08em; text-transform: uppercase;
   padding: 18px 24px; border-radius: var(--radius-sm); width: 100%; border: none;
-  cursor: pointer; margin-top: 0.5rem;
+  cursor: pointer; margin-top: 0.75rem;
+  min-height: 56px; /* large tap target */
   transition: background var(--t-base) var(--ease), transform var(--t-fast) var(--ease), box-shadow var(--t-base) var(--ease);
 }
 .submit:hover {

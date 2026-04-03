@@ -105,7 +105,7 @@ export default function ResultsPage() {
           <p className={styles.subtitle}>
             {hasMatch
               ? 'All availability collected. Here\'s what we found.'
-              : `${respondedCount} of ${round.players.length} players responded. Share the links below.`}
+              : `${respondedCount} of ${round.players.length} players have responded. Copy and share the links below!`}
           </p>
         </div>
 
@@ -201,11 +201,11 @@ export default function ResultsPage() {
             {!hasMatch && (
               <div className={styles.waitCard}>
                 <div className={styles.waitDots}><span/><span/><span/></div>
-                <h2 className={styles.waitTitle}>Collecting availability</h2>
+                <h2 className={styles.waitTitle}>Waiting on the crew</h2>
                 <p className={styles.waitDesc}>
-                  Once everyone responds, TeeTimeQuest will automatically match the best
-                  date, tee time, and courses near your group.
-                  {round.players.length <= 2 && ' Updates in real time as players respond.'}
+                  Share the links on the right with your players. Once everyone responds,
+                  we'll automatically find the best date and suggest courses near your group.
+                  This page updates live as people respond.
                 </p>
                 <div className={styles.waitProgress}>
                   <div className={styles.waitProgressFill} style={{ width: `${(respondedCount / round.players.length) * 100}%` }} />

@@ -131,7 +131,7 @@ export default function AvailabilityPage() {
 
           {/* ── Header ── */}
           <header className={styles.header}>
-            <div className={styles.eyebrow}>Invite</div>
+            <div className={styles.eyebrow}>📬 You're invited</div>
             <h1 className={styles.title}>Hey {player.name}! 👋</h1>
             <p className={styles.subtitle}>
               <strong>{organizer?.name}</strong> is planning a round near <strong>{round.city}</strong>.
@@ -154,7 +154,7 @@ export default function AvailabilityPage() {
                 <p className={styles.successDesc}>
                   {allResponded
                     ? 'Everyone responded, results are ready.'
-                    : "We'll notify you when the tee time is confirmed."}
+                    : "Sit tight, we'll find the best time once everyone responds."}
                 </p>
               </div>
               {allResponded && (
@@ -175,7 +175,7 @@ export default function AvailabilityPage() {
                   <span className={styles.cardTitle}>Your location</span>
                 </div>
                 <CityPicker value={location} onChange={setLocation} placeholder="City or ZIP code (e.g. Cambridge, MA)" />
-                <p className={styles.hint}>Helps find courses central to everyone.</p>
+                <p className={styles.hint}>We use this to find courses between everyone. City or ZIP both work.</p>
               </div>
 
               <div className={styles.card}>
@@ -184,7 +184,7 @@ export default function AvailabilityPage() {
                   <span className={styles.cardTitle}>Your available dates</span>
                   {selected.size > 0 && <span className={styles.badge}>{selected.size} selected</span>}
                 </div>
-                <p className={styles.hint} style={{marginBottom:'1rem'}}>Tap every day you could make it.</p>
+                <p className={styles.hint} style={{marginBottom:'1rem'}}>Tap every day that works for you. Pick as many as you like!</p>
                 {Object.entries(monthGroups).map(([month, mdates]) => (
                   <div key={month} className={styles.monthGroup}>
                     <p className={styles.monthLabel}>{month}</p>
@@ -206,7 +206,7 @@ export default function AvailabilityPage() {
                   <span className={styles.cardNum}>03</span>
                   <span className={styles.cardTitle}>Preferred tee times</span>
                 </div>
-                <p className={styles.hint} style={{marginBottom:'0.9rem'}}>Select all windows that work for you.</p>
+                <p className={styles.hint} style={{marginBottom:'0.9rem'}}>Pick all the windows that work. More options means a better match.</p>
                 <div className={styles.timeGrid}>
                   {TIME_PREFS.map(t => (
                     <button key={t.id} type="button"
