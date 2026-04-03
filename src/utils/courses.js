@@ -186,9 +186,22 @@ export async function findCoursesNearPlayers(players, fallbackCity, limit = 5) {
 
   if (!elements.length) return null
 
+  // Keywords strongly associated with private/members-only clubs
+  const PRIVATE_KEYWORDS = [
+    'country club', 'cc', 'yacht', 'hunt club', 'polo',
+    'private', 'members only', 'athletic club',
+  ]
+
   const courses = elements
     .map(el => normalise(el, center.lat, center.lng))
-    .filter(c => c.name)                                                    // must have a name
+    .filter(c => c.name)
+    // Filter out courses explicitly tagged private or members-only
+    .filter(c => !['private', 'members', 'permissive'].includes(c.access?.toLowerCase()))
+    // Filter out courses whose names strongly suggest private membership
+    .filter(c => {
+      const lower = c.name.toLowerCase()
+      return !PRIVATE_KEYWORDS.some(kw => lower.includes(kw))
+    })
     .sort((a, b) => parseFloat(a.distanceMi ?? 999) - parseFloat(b.distanceMi ?? 999))
     .filter((c, i, arr) => arr.findIndex(x => x.name === c.name) === i)    // deduplicate
 

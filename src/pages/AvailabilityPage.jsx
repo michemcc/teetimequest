@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
 import CityPicker from '../components/CityPicker'
 import Footer from '../components/Footer'
-import { getRound, saveAvailability } from '../utils/store'
+import { getRound, saveAvailability, updatePlayerName } from '../utils/store'
 import { getNextNDays, formatDate, groupByMonth } from '../utils/dates'
 import styles from './AvailabilityPage.module.css'
 
@@ -18,16 +18,18 @@ export default function AvailabilityPage() {
   const { roundId, playerId } = useParams()
   const navigate = useNavigate()
 
-  const [round,     setRound]     = useState(null)
-  const [player,    setPlayer]    = useState(null)
-  const [selected,  setSelected]  = useState(new Set())
-  const [timePref,  setTimePref]  = useState(new Set(['morning']))
-  const [location,  setLocation]  = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [loading,   setLoading]   = useState(true)
-  const [saving,    setSaving]    = useState(false)
-  const [error,     setError]     = useState('')
-  const [notFound,  setNotFound]  = useState(false)
+  const [round,       setRound]       = useState(null)
+  const [player,      setPlayer]      = useState(null)
+  const [selected,    setSelected]    = useState(new Set())
+  const [timePref,    setTimePref]    = useState(new Set(['morning']))
+  const [location,    setLocation]    = useState('')
+  const [playerName,  setPlayerName]  = useState('')
+  const [submitted,   setSubmitted]   = useState(false)
+  const [editing,     setEditing]     = useState(false)   // editing after prior submission
+  const [loading,     setLoading]     = useState(true)
+  const [saving,      setSaving]      = useState(false)
+  const [error,       setError]       = useState('')
+  const [notFound,    setNotFound]    = useState(false)
 
   const dates       = getNextNDays(15)
   const monthGroups = groupByMonth(dates)
@@ -41,6 +43,7 @@ export default function AvailabilityPage() {
         if (!p) return setNotFound(true)
         setRound(r)
         setPlayer(p)
+        setPlayerName(p.name || '')
         if (p.availability) {
           setSelected(new Set(p.availability.dates || []))
           const tp = p.availability.timePreferences ||
@@ -69,18 +72,29 @@ export default function AvailabilityPage() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    if (selected.size === 0)  return setError("Pick at least one date you're available.")
-    if (!location.trim())     return setError('Enter your starting location.')
-    if (timePref.size === 0)  return setError('Choose at least one preferred tee time.')
+
+    if (!playerName.trim())    return setError('Enter your name so the organizer knows who you are.')
+    if (selected.size === 0)   return setError("Pick at least one date you're available.")
+    if (!location.trim())      return setError('Enter your starting location.')
+    if (timePref.size === 0)   return setError('Choose at least one preferred tee time.')
 
     setSaving(true)
     try {
+      // Update name if it changed
+      if (playerName.trim() !== player.name) {
+        await updatePlayerName(roundId, playerId, playerName.trim())
+        setPlayer(p => ({ ...p, name: playerName.trim() }))
+      }
+
+      // Save availability — returns fast, course lookup happens in background
       const updated = await saveAvailability(roundId, playerId, {
         location: location.trim(),
         dates: [...selected],
         timePreferences: [...timePref],
       })
+
       setSubmitted(true)
+      setEditing(false)
       setRound(updated)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
@@ -89,6 +103,12 @@ export default function AvailabilityPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  function handleEdit() {
+    setEditing(true)
+    setSubmitted(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   /* ── Loading / error states ── */
@@ -121,6 +141,7 @@ export default function AvailabilityPage() {
   const respondedCount = round.players.filter(p => p.availability).length
   const allResponded   = respondedCount === round.players.length
   const organizer      = round.players.find(p => p.isOrganizer)
+  const displayName    = playerName || player.name
 
   return (
     <div className={styles.page}>
@@ -132,10 +153,12 @@ export default function AvailabilityPage() {
           {/* ── Header ── */}
           <header className={styles.header}>
             <div className={styles.eyebrow}>📬 You're invited</div>
-            <h1 className={styles.title}>Hey {player.name}! 👋</h1>
+            <h1 className={styles.title}>
+              {submitted ? `Thanks, ${displayName}! 🎉` : `Hey${displayName ? ` ${displayName}` : ''}! 👋`}
+            </h1>
             <p className={styles.subtitle}>
               <strong>{organizer?.name}</strong> is planning a round near <strong>{round.city}</strong>.
-              Mark your availability below.
+              {!submitted && ' Mark your availability below.'}
             </p>
             <div className={styles.progressRow}>
               <div className={styles.progressTrack}>
@@ -153,15 +176,20 @@ export default function AvailabilityPage() {
                 <p className={styles.successTitle}>You're in!</p>
                 <p className={styles.successDesc}>
                   {allResponded
-                    ? 'Everyone responded, results are ready.'
+                    ? 'Everyone responded, finding the best time now...'
                     : "Sit tight, we'll find the best time once everyone responds."}
                 </p>
               </div>
-              {allResponded && (
-                <button className={styles.resultsBtn} onClick={() => navigate(`/results/${roundId}`)}>
-                  View results →
+              <div className={styles.successActions}>
+                {allResponded && (
+                  <button className={styles.resultsBtn} onClick={() => navigate(`/results/${roundId}`)}>
+                    View results →
+                  </button>
+                )}
+                <button className={styles.editBtn} onClick={handleEdit}>
+                  Change my answers
                 </button>
-              )}
+              </div>
             </div>
           )}
 
@@ -169,18 +197,37 @@ export default function AvailabilityPage() {
           {!submitted && (
             <form className={styles.form} onSubmit={handleSubmit} noValidate>
 
+              {/* Name */}
               <div className={styles.card}>
                 <div className={styles.cardHead}>
                   <span className={styles.cardNum}>01</span>
-                  <span className={styles.cardTitle}>Your location</span>
+                  <span className={styles.cardTitle}>Your name</span>
                 </div>
-                <CityPicker value={location} onChange={setLocation} placeholder="City or ZIP code (e.g. Cambridge, MA)" />
-                <p className={styles.hint}>We use this to find courses between everyone. City or ZIP both work.</p>
+                <input
+                  className={styles.nameInput}
+                  type="text"
+                  placeholder="Your first name (e.g. Mike)"
+                  value={playerName}
+                  onChange={e => setPlayerName(e.target.value)}
+                  autoComplete="given-name"
+                />
+                <p className={styles.hint}>So the organizer knows who's who.</p>
               </div>
 
+              {/* Location */}
               <div className={styles.card}>
                 <div className={styles.cardHead}>
                   <span className={styles.cardNum}>02</span>
+                  <span className={styles.cardTitle}>Your location</span>
+                </div>
+                <CityPicker value={location} onChange={setLocation} placeholder="City or ZIP code (e.g. Providence, RI)" />
+                <p className={styles.hint}>We use this to find courses between everyone. City or ZIP both work.</p>
+              </div>
+
+              {/* Dates */}
+              <div className={styles.card}>
+                <div className={styles.cardHead}>
+                  <span className={styles.cardNum}>03</span>
                   <span className={styles.cardTitle}>Your available dates</span>
                   {selected.size > 0 && <span className={styles.badge}>{selected.size} selected</span>}
                 </div>
@@ -201,9 +248,10 @@ export default function AvailabilityPage() {
                 ))}
               </div>
 
+              {/* Time prefs */}
               <div className={styles.card}>
                 <div className={styles.cardHead}>
-                  <span className={styles.cardNum}>03</span>
+                  <span className={styles.cardNum}>04</span>
                   <span className={styles.cardTitle}>Preferred tee times</span>
                 </div>
                 <p className={styles.hint} style={{marginBottom:'0.9rem'}}>Pick all the windows that work. More options means a better match.</p>
@@ -229,6 +277,10 @@ export default function AvailabilityPage() {
               <button type="submit" className={styles.submit} disabled={saving}>
                 {saving ? (
                   <><span className={styles.submitSpinner}/>Saving…</>
+                ) : editing ? (
+                  <>Update my availability
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                  </>
                 ) : (
                   <>Submit my availability
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>

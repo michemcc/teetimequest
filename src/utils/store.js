@@ -76,6 +76,31 @@ export async function saveAvailability(roundId, playerId, availability) {
     : _local_saveAvailability(roundId, playerId, availability)
 }
 
+/**
+ * Update a player's display name.
+ * Called when a player edits their name on the invite page.
+ */
+export async function updatePlayerName(roundId, playerId, name) {
+  if (useSupabase()) {
+    const { error } = await supabase
+      .from('players')
+      .update({ name: name.trim() })
+      .eq('id', playerId)
+      .eq('round_id', roundId)
+    if (error) throw new Error(`updatePlayerName: ${error.message}`)
+    return _supabase_getRound(roundId)
+  } else {
+    const all   = _ls_getAll()
+    const round = all[roundId]
+    if (!round) throw new Error('Round not found')
+    const player = round.players.find(p => p.id === playerId)
+    if (!player) throw new Error('Player not found')
+    player.name = name.trim()
+    _ls_save(round)
+    return Promise.resolve(round)
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    SUPABASE BACKEND
 ═══════════════════════════════════════════════════════════════════════════ */
@@ -170,6 +195,7 @@ async function _supabase_getRound(roundId) {
 async function _supabase_saveAvailability(roundId, playerId, availability) {
   const now = new Date().toISOString()
 
+  /* ── 1. Save availability immediately ── */
   const { error } = await supabase
     .from('players')
     .update({ availability, responded_at: now })
@@ -178,26 +204,43 @@ async function _supabase_saveAvailability(roundId, playerId, availability) {
 
   if (error) throw new Error(`saveAvailability: ${error.message}`)
 
-  /* Re-fetch the full round to check if everyone is done */
+  /* ── 2. Re-fetch round to check if everyone responded ── */
   const round = await _supabase_getRound(roundId)
   if (!round) throw new Error('Round not found after update')
 
   const allResponded = round.players.every(p => p.availability)
 
   if (allResponded) {
-    const match = await computeMatch(round)
-    const status = match ? 'matched' : 'collecting'
-    const { error: matchError } = await supabase
-      .from('rounds')
-      .update({ match, status })
-      .eq('id', roundId)
-
-    if (matchError) throw new Error(`saveAvailability (match): ${matchError.message}`)
-    round.match = match
-    round.status = status
+    /* ── 3. Return to user immediately, run course lookup in background ──
+       computeMatch hits Nominatim + Overpass which can take 5-15s.
+       We don't want the user staring at a spinner for that.
+       Fire it async, update Supabase when done — realtime subscription
+       on ResultsPage will pick up the change automatically. */
+    _computeAndSaveMatch(roundId, round)
+    // Return the round with status 'matched' optimistically so the
+    // success banner shows immediately
+    round.status = 'matched'
   }
 
   return round
+}
+
+/**
+ * Background job: compute the match (slow — hits Nominatim + Overpass)
+ * and save it to Supabase. ResultsPage realtime subscription picks it up.
+ */
+async function _computeAndSaveMatch(roundId, round) {
+  try {
+    const match  = await computeMatch(round)
+    const status = match ? 'matched' : 'collecting'
+    await supabase
+      .from('rounds')
+      .update({ match, status })
+      .eq('id', roundId)
+    console.info('[match] Computed and saved for round', roundId)
+  } catch (err) {
+    console.error('[match] Background match computation failed:', err.message)
+  }
 }
 
 /* ── Shape normaliser ── DB uses snake_case; app expects camelCase ── */
