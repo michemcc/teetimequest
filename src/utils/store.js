@@ -251,30 +251,22 @@ async function _computeAndSaveMatch(roundId, round) {
     return // if even this fails, give up
   }
 
-  /* ── Phase 2: upgrade with real courses (best-effort, 20s budget) ── */
+  /* ── Phase 2: call /api/match to upgrade courses server-side ──
+     This runs in its own Vercel function with a fresh timeout budget.
+     It geocodes, hits Overpass, filters private clubs, and patches
+     the round with real courses. Realtime subscription picks it up.    */
   try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 20000) // hard 20s cap
-
-    const realMatch = await Promise.race([
-      computeMatch(round),
-      new Promise((_, reject) =>
-        controller.signal.addEventListener('abort', () => reject(new Error('timeout')))
-      ),
-    ])
-
-    clearTimeout(timeout)
-
-    if (realMatch && realMatch.suggestedCourses?.[0]?.source === 'openstreetmap') {
-      await supabase
-        .from('rounds')
-        .update({ match: realMatch, status: 'matched' })
-        .eq('id', roundId)
-      console.info('[match] Phase 2 saved (real courses) for round', roundId)
-    }
-  } catch (err) {
-    // Phase 2 failure is silent — mock match already saved in Phase 1
-    console.info('[match] Phase 2 skipped:', err.message)
+    fetch('/api/match', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ roundId }),
+    }).then(r => r.json()).then(d => {
+      console.info('[match] Phase 2 result:', d)
+    }).catch(err => {
+      console.info('[match] Phase 2 call failed (non-critical):', err.message)
+    })
+  } catch {
+    // Phase 2 is fire-and-forget — Phase 1 mock match already saved
   }
 }
 
