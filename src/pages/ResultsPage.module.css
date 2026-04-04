@@ -434,3 +434,65 @@
   0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent); }
   50%       { opacity: 0.5; box-shadow: 0 0 2px var(--accent); }
 }
+
+/* ─── Course skeleton / loading state ───────── */
+.courseSkeleton {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--bg-overlay);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-strong);
+}
+[data-theme="dark"] .courseSkeleton {
+  background: var(--bg-inset);
+}
+
+.courseSkeletonIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  opacity: 0.5;
+  animation: skeletonPulse 1.6s ease-in-out infinite;
+}
+
+.courseSkeletonText { flex: 1; min-width: 0; }
+
+.courseSkeletonTitle {
+  font-family: var(--font-score);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.courseSkeletonSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.courseSkeletonDots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.courseSkeletonDots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: skeletonBounce 1.2s ease-in-out infinite;
+  opacity: 0.6;
+}
+.courseSkeletonDots span:nth-child(2) { animation-delay: 0.15s; }
+.courseSkeletonDots span:nth-child(3) { animation-delay: 0.30s; }
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.7;  }
+}
+@keyframes skeletonBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+  40%           { transform: scale(1);   opacity: 0.8; }
+}
