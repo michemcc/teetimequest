@@ -173,23 +173,71 @@ out center tags;`
       return res.status(200).json({ ok: true, source: 'all-filtered' })
     }
 
-    /* ── 6. Build and save upgraded match ── */
-    const existing = round.match || {}
+    /* ── 6. Compute a complete match with real courses ──
+       Don't rely on reading Phase 1 data from DB (race condition).
+       Compute date/teeTime ourselves from player availability,
+       then attach the real courses we just fetched.              */
 
-    // Keep existing date/teeTime/storyline, just upgrade courses
-    const upgradedMatch = {
-      ...existing,
-      suggestedCourses: courses,
+    // Date matching logic (same as computeMatchSync)
+    const dateSets = normalisedPlayers
+      .filter(p => p.availability?.dates?.length)
+      .map(p => new Set(p.availability.dates))
+
+    if (!dateSets.length) {
+      return res.status(200).json({ ok: true, source: 'no-dates' })
     }
 
-    // Update storyline city from real course address
-    if (existing.date && existing.teeTime && courses[0]?.address) {
-      const parts = courses[0].address.split(',').map(s => s.trim()).filter(Boolean)
-      const courseCity = parts.length >= 2 ? parts.slice(-2).join(', ') : parts[0]
-      // Simple story upgrade — keep format but fix city
-      if (existing.storyline && existing.storyline.includes(round.city)) {
-        upgradedMatch.storyline = existing.storyline.replace(round.city, courseCity)
-      }
+    let commonDates = [...dateSets[0]]
+    for (let i = 1; i < dateSets.length; i++) {
+      commonDates = commonDates.filter(d => dateSets[i].has(d))
+    }
+    if (!commonDates.length) {
+      const counts = {}
+      normalisedPlayers.forEach(p => p.availability?.dates?.forEach(d => {
+        counts[d] = (counts[d] || 0) + 1
+      }))
+      const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]
+      if (!best) return res.status(200).json({ ok: true, source: 'no-common-dates' })
+      commonDates = [best[0]]
+    }
+    commonDates.sort()
+    const chosenDate = commonDates[0]
+
+    // Tee time from preferences
+    const prefCounts = {}
+    normalisedPlayers.forEach(p =>
+      (p.availability?.timePreferences || []).forEach(tp => {
+        prefCounts[tp] = (prefCounts[tp] || 0) + 1
+      })
+    )
+    const topPref = Object.entries(prefCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'morning'
+    const teeTimeMap = {
+      early:     ['6:00 AM', '6:30 AM', '7:00 AM', '7:30 AM'],
+      morning:   ['8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM'],
+      midday:    ['10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'],
+      afternoon: ['12:00 PM', '12:30 PM', '1:00 PM', '2:00 PM', '3:00 PM'],
+    }
+    const timeCandidates = teeTimeMap[topPref] || ['8:00 AM', '8:30 AM']
+    // Deterministic pick from round ID so same round = same time
+    const timeIdx = roundId.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % timeCandidates.length
+    const chosenTime = timeCandidates[timeIdx]
+
+    // Storyline city from top course address
+    const topCourse = courses[0]
+    let city = round.city
+    if (topCourse?.address) {
+      const parts = topCourse.address.split(',').map(s => s.trim()).filter(Boolean)
+      city = parts.length >= 2 ? parts.slice(-2).join(', ') : parts[0] || city
+    }
+
+    // Build the complete match object — no dependency on Phase 1
+    const fullMatch = {
+      date:             chosenDate,
+      teeTime:          chosenTime,
+      commonDatesCount: commonDates.length,
+      suggestedCourses: courses,
+      confirmedCourse:  null,
+      storyline:        null, // client computes this on display if null
     }
 
     const patchRes = await fetch(
@@ -197,7 +245,7 @@ out center tags;`
       {
         method: 'PATCH',
         headers: { ...headers, Prefer: 'return=minimal' },
-        body: JSON.stringify({ match: upgradedMatch }),
+        body: JSON.stringify({ match: fullMatch, status: 'matched' }),
       }
     )
 
