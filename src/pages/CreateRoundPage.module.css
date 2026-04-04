@@ -1,256 +1,272 @@
-/* ══════════════════════════════════════════════════
-   CreateRoundPage — Enterprise form
-   Cards have a numbered step rail on the left.
-   Precise, clean, functional.
-══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   CreateRoundPage — Golf arcade form
+   Step rail with colour-coded holes. Arcade inputs.
+   Mobile-first: chunky, tappable, satisfying.
+═══════════════════════════════════════════════════════════ */
 
-.page { min-height: 100vh; background: var(--bg-base); display: flex; flex-direction: column; }
-.pageInner { flex: 1; padding: 2.5rem 1.5rem 5rem; box-sizing: border-box; }
-@media (max-width: 480px) { .pageInner { padding: 2rem 1rem 4.5rem; } }
-@media (max-width: 380px) { .pageInner { padding: 1.75rem 0.875rem 4rem; } }
+.page { min-height:100vh; background:var(--bg-base); display:flex; flex-direction:column; }
+.pageInner { flex:1; padding:2rem 1.25rem 5rem; box-sizing:border-box; }
+@media (max-width:480px) { .pageInner { padding:1.75rem 1rem 4.5rem; } }
 
-/* ─── Header ─────────────────────────────────── */
-.header { margin-bottom: 2rem; }
+/* ── Header ─────────────────────────────────── */
+.header { margin-bottom:2rem; }
 
-.headerMeta {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;
-}
+.headerMeta { display:flex; align-items:center; gap:8px; margin-bottom:0.75rem; }
 .headerBadge {
-  font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-muted); background: linear-gradient(to bottom, var(--bg-overlay), var(--bg-inset));
-  border: 1px solid var(--border-score, var(--border-strong));
-  padding: 3px 8px; border-radius: var(--radius-sm);
+  font-family:var(--font-score); font-size:0.58rem; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--green-900); background:var(--gold-400);
+  padding:4px 10px; border-radius:var(--radius-xs);
+  box-shadow:0 2px 0 var(--gold-600);
 }
+[data-theme="dark"] .headerBadge { color:var(--green-950); }
 
 .title {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-  font-weight: 400; color: var(--text-primary);
-  margin-bottom: 0.4rem; line-height: 1.1;
+  font-family:var(--font-display);
+  font-size:clamp(1.7rem, 5vw, 2.6rem);
+  font-weight:400; color:var(--text-primary);
+  margin-bottom:0.4rem; line-height:1.1;
 }
-.subtitle { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
+.subtitle { font-size:0.875rem; color:var(--text-secondary); line-height:1.6; }
 
-/* ─── Form ────────────────────────────────────── */
-.form { display: flex; flex-direction: column; gap: 1px; }
+/* ── Form — cards flush together like scorecard rows ── */
+.form { display:flex; flex-direction:column; gap:0; }
 
-/* ══════════════════════════════════════════════════
-   STEP CARDS — the visual centrepiece
-   
-   Layout: step rail (left) | content (right)
-   
-   The step rail is a fixed-width column containing:
-   - A numbered circle badge
-   - A vertical connector line to the next card
-   
-   Cards flow together with 1px gap, creating
-   a connected vertical timeline feel.
-══════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════
+   STEP CARDS — scorecard row layout
+   Left rail: coloured step number + connector
+   Right: content
+════════════════════════════════════════════════ */
 .card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-strong);
-  /* Top card — rounded top */
-  position: relative;
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  /* No gap — rail and content share the card */
-  transition: background var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease);
+  background:var(--bg-surface);
+  border:2px solid var(--border-strong);
+  position:relative;
+  display:grid;
+  grid-template-columns:52px 1fr;
+  transition:background var(--t-slow) var(--ease);
 }
-.card:hover { box-shadow: var(--shadow-sm); }
+.card:first-of-type  { border-radius:var(--radius-lg) var(--radius-lg) 0 0; }
+.card:last-of-type   { border-radius:0 0 var(--radius-lg) var(--radius-lg); border-top:none; }
+.card:not(:first-of-type):not(:last-of-type) { border-top:none; }
 
-/* First card rounded top */
-.card:first-of-type { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
-/* Last card rounded bottom */
-.card:last-of-type  { border-radius: 0 0 var(--radius-lg) var(--radius-lg); border-top: none; }
-/* Middle cards */
-.card:not(:first-of-type):not(:last-of-type) { border-top: none; }
+@media (max-width:420px) {
+  .card { grid-template-columns:44px 1fr; }
+}
 
-/* ─── Step rail (left column) ─────────────────── */
+/* ── Step rail ──────────────────────────────── */
 .stepRail {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 0 0;
-  border-right: 1px solid var(--border-strong);
-  background: var(--bg-overlay);
-  position: relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:1.25rem 0 0;
+  border-right:2px solid var(--border-strong);
+  position:relative;
+  /* Alternating rail backgrounds per step — scorecard column feel */
+  background:var(--bg-overlay);
 }
 
-/* Numbered badge */
+/* Connector line */
+.stepRail::after {
+  content:'';
+  position:absolute;
+  top:calc(1.25rem + 32px + 8px);
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:2px;
+  background:var(--border-strong);
+}
+.card:last-of-type .stepRail::after { display:none; }
+
 .stepBadge {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: var(--gold-400); color: var(--green-900);
-  font-family: var(--font-score); font-size: 0.72rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; position: relative; z-index: 1;
-  box-shadow: 0 0 0 3px var(--bg-overlay), 0 0 0 5px rgba(201,160,58,0.35);
-  transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  width:32px; height:32px; border-radius:50%;
+  font-family:var(--font-score); font-size:0.75rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; position:relative; z-index:1;
+  transition:transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  /* Gold arcade badge */
+  background:var(--gold-400);
+  color:var(--green-900);
+  box-shadow:0 0 0 3px var(--bg-overlay), 0 0 0 5px var(--gold-500), 0 3px 0 var(--gold-700);
 }
 .card:hover .stepBadge {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 3px var(--bg-overlay), 0 0 0 5px rgba(201,160,58,0.6);
+  transform:scale(1.08);
+  box-shadow:0 0 0 3px var(--bg-overlay), 0 0 0 5px var(--gold-400), 0 4px 12px rgba(180,130,36,0.45);
 }
-/* Last card has no connector line */
-.card:last-of-type .stepRail::after { display: none; }
+[data-theme="dark"] .stepBadge { color:var(--green-950); }
 
-/* Step icon below badge */
-.stepIcon {
-  font-size: 1rem;
-  margin-top: 0.75rem;
-  line-height: 1;
-}
+.stepIcon { font-size:1.1rem; margin-top:0.6rem; line-height:1; }
 
-/* ─── Card content (right column) ─────────────── */
-.cardContent {
-  padding: 1.5rem 1.5rem 1.5rem 1.25rem;
-}
+/* ── Card content ───────────────────────────── */
+.cardContent { padding:1.25rem 1.25rem 1.25rem 1rem; }
+@media (max-width:420px) { .cardContent { padding:1rem 0.875rem 1rem 0.75rem; } }
 
-.cardHead {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 1rem;
-}
+.cardHead { display:flex; align-items:center; gap:8px; margin-bottom:0.875rem; }
 .cardTitle {
-  font-family: var(--font-body);
-  font-size: 0.88rem; font-weight: 600;
-  color: var(--text-primary);
-  flex: 1;
-  letter-spacing: -0.01em;
+  font-family:var(--font-score); font-size:0.68rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--text-primary); flex:1;
 }
 .playerBadge {
-  font-family: var(--font-mono); font-size: 0.62rem;
-  color: var(--text-muted); background: var(--bg-overlay);
-  border: 1px solid var(--border-strong);
-  padding: 2px 8px; border-radius: var(--radius-sm);
+  font-family:var(--font-score); font-size:0.58rem; font-weight:700;
+  color:var(--accent-text); background:var(--accent);
+  padding:3px 8px; border-radius:var(--radius-xs);
+  letter-spacing:0.06em;
 }
-.cardDesc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.5; }
+[data-theme="dark"] .playerBadge { color:var(--accent-text); }
+.cardDesc { font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.875rem; line-height:1.5; }
 
-/* ─── Inputs ───────────────────────────────────── */
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-@media (max-width: 500px) { .row2 { grid-template-columns: 1fr; } }
+/* ── Inputs — game console inset style ─────── */
+.row2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+@media (max-width:500px) { .row2 { grid-template-columns:1fr; } }
 
-.field { display: flex; flex-direction: column; gap: 5px; }
+.field { display:flex; flex-direction:column; gap:5px; }
 
 .label {
-  font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500;
-  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);
+  font-family:var(--font-score); font-size:0.58rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted);
 }
 
 .input {
-  height: 48px; padding: 0 14px;
-  touch-action: manipulation;
-  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
-  font-size: 0.875rem; color: var(--text-primary); background: var(--bg-base);
-  outline: none; width: 100%;
-  transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  height:48px; padding:0 14px;
+  border:2px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  font-size:1rem; color:var(--text-primary);
+  background:var(--bg-base);
+  outline:none; width:100%;
+  touch-action:manipulation;
+  /* Inset game console feel */
+  box-shadow:inset 0 2px 4px rgba(18,12,4,0.10);
+  transition:border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
 }
-.input::placeholder { color: var(--text-muted); }
+.input::placeholder { color:var(--text-muted); }
 .input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 15%, transparent);
-  background: var(--bg-surface);
+  border-color:var(--accent);
+  box-shadow:inset 0 2px 4px rgba(18,12,4,0.06), 0 0 0 3px var(--accent-light);
+  background:var(--bg-surface);
 }
-.hint { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
+[data-theme="dark"] .input { background:var(--bg-inset); box-shadow:inset 0 2px 6px rgba(0,0,0,0.3); }
+[data-theme="dark"] .input:focus { background:var(--bg-overlay); }
 
-/* ─── Players ──────────────────────────────────── */
-.playerList { display: flex; flex-direction: column; gap: 6px; }
-.playerRow { display: grid; grid-template-columns: 16px 1fr 26px; align-items: center; gap: 6px; }
-.playerNum { font-family: var(--font-mono); font-size: 0.58rem; color: var(--text-muted); text-align: center; }
+.hint { font-size:0.72rem; color:var(--text-muted); line-height:1.5; margin-top:4px; }
+
+/* ── Players ─────────────────────────────────── */
+.playerList { display:flex; flex-direction:column; gap:6px; }
+.playerRow { display:grid; grid-template-columns:16px 1fr 26px; align-items:center; gap:6px; }
+.playerNum { font-family:var(--font-score); font-size:0.58rem; color:var(--text-muted); text-align:center; }
 
 .removeBtn {
-  width: 26px; height: 26px; border-radius: var(--radius-sm);
-  color: var(--text-muted); background: transparent; border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  transition: all var(--t-base) var(--ease);
+  width:26px; height:26px; border-radius:var(--radius-sm);
+  color:var(--text-muted); background:transparent;
+  border:1px solid var(--border-strong);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:all var(--t-base) var(--ease);
 }
-.removeBtn:hover { background: var(--danger-bg, #faeaea); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
+.removeBtn:hover { background:var(--danger-bg); color:var(--danger); border-color:var(--danger); }
 
 .addBtn {
-  margin-top: 10px; display: inline-flex; align-items: center; gap: 6px;
-  font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
-  transition: color var(--t-base) var(--ease);
+  margin-top:10px; display:inline-flex; align-items:center; gap:6px;
+  font-family:var(--font-score); font-size:0.62rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--accent); transition:color var(--t-base) var(--ease);
 }
-.addBtn:hover { color: var(--accent); }
-.maxNote { margin-top: 8px; font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); }
+.addBtn:hover { color:var(--accent-hover); }
+.maxNote { margin-top:8px; font-family:var(--font-score); font-size:0.62rem; color:var(--gold); letter-spacing:0.05em; }
 
-/* ─── Date grid ────────────────────────────────── */
-.monthGroup { margin-bottom: 1rem; }
-.monthLabel { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
-.dateGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: 4px; }
+/* ── Date grid ───────────────────────────────── */
+.monthGroup { margin-bottom:1rem; }
+.monthLabel {
+  font-family:var(--font-score); font-size:0.58rem; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;
+}
+.dateGrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:5px; }
 
 .dateBtn {
-  padding: 10px 8px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
-  font-size: 0.76rem; color: var(--text-secondary); background: var(--bg-base);
-  text-align: center; cursor: pointer; min-height: 44px;
-  transition: all var(--t-base) var(--ease);
+  padding:11px 6px; border:2px solid var(--border-strong); border-radius:var(--radius-sm);
+  font-family:var(--font-score); font-size:0.65rem; font-weight:700;
+  letter-spacing:0.04em;
+  color:var(--text-secondary); background:var(--bg-base);
+  text-align:center; cursor:pointer; min-height:44px;
+  touch-action:manipulation;
+  transition:all var(--t-fast) var(--ease);
+  box-shadow:0 2px 0 var(--bg-inset);
 }
-.dateBtn:hover { border-color: var(--accent); color: var(--text-primary); }
-.dateBtnOn { background: var(--accent) !important; border-color: var(--accent) !important; color: var(--accent-text) !important; }
+.dateBtn:hover { border-color:var(--accent); color:var(--accent); background:var(--bg-surface); }
+.dateBtnOn {
+  background:var(--accent) !important;
+  border-color:var(--accent-hover) !important;
+  color:var(--accent-text) !important;
+  box-shadow:0 2px 0 var(--accent-hover), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+}
 
-/* ─── Time prefs ────────────────────────────────── */
-.timeDivider { height: 1px; background: var(--border); margin: 1rem 0; }
-.timeLabel { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.6rem; }
-.timeLabelNote { font-size: 0.6rem; color: var(--text-muted); opacity: 0.7; text-transform: none; letter-spacing: 0; font-weight: 400; }
+/* ── Time prefs ──────────────────────────────── */
+.timeDivider { height:2px; background:var(--border-strong); margin:1rem 0; }
+.timeLabel {
+  font-family:var(--font-score); font-size:0.62rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.6rem;
+}
+.timeLabelNote { font-size:0.58rem; color:var(--text-muted); opacity:0.7; text-transform:none; letter-spacing:0; font-weight:400; }
 
-.timeGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-@media (max-width: 480px) { .timeGrid { grid-template-columns: repeat(2, 1fr); } }
+.timeGrid { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+@media (max-width:480px) { .timeGrid { grid-template-columns:repeat(2,1fr); } }
 
 .timeBtn {
-  padding: 10px 8px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
-  background: var(--bg-base); cursor: pointer;
-  display: flex; flex-direction: column; gap: 2px;
-  transition: all var(--t-base) var(--ease);
+  padding:12px 8px; border:2px solid var(--border-strong); border-radius:var(--radius-sm);
+  background:var(--bg-base); cursor:pointer; text-align:left;
+  display:flex; flex-direction:column; gap:3px; min-height:64px;
+  touch-action:manipulation;
+  box-shadow:0 2px 0 var(--bg-inset);
+  transition:all var(--t-fast) var(--ease);
 }
-.timeBtn:hover { border-color: var(--accent); }
-.timeBtnOn { background: var(--accent) !important; border-color: var(--accent) !important; }
-.timeBtnLabel { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
-.timeBtnDesc  { font-size: 0.64rem; color: var(--text-muted); }
-.timeBtnOn .timeBtnLabel { color: var(--accent-text); }
-.timeBtnOn .timeBtnDesc  { color: color-mix(in srgb, var(--accent-text) 65%, transparent); }
+.timeBtn:hover { border-color:var(--accent); box-shadow:0 2px 0 var(--accent-hover); }
+.timeBtnOn {
+  background:var(--accent) !important;
+  border-color:var(--accent-hover) !important;
+  box-shadow:0 2px 0 var(--accent-hover), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+.timeBtnLabel { font-family:var(--font-score); font-size:0.72rem; font-weight:700; color:var(--text-primary); }
+.timeBtnDesc  { font-size:0.62rem; color:var(--text-muted); }
+.timeBtnOn .timeBtnLabel { color:var(--accent-text); }
+.timeBtnOn .timeBtnDesc  { color:rgba(255,255,255,0.65); }
 
-/* ─── Error / Submit ────────────────────────────── */
+/* ── Error ───────────────────────────────────── */
 .error {
-  display: flex; align-items: flex-start; gap: 8px;
-  background: var(--danger-bg, #faeaea);
-  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
-  border-left: 3px solid var(--danger);
-  color: var(--danger); border-radius: var(--radius-sm);
-  padding: 10px 12px; font-size: 0.82rem; line-height: 1.5;
-  margin-top: 1rem;
+  display:flex; align-items:flex-start; gap:8px;
+  background:var(--danger-bg);
+  border:2px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-left:4px solid var(--danger);
+  color:var(--danger); border-radius:var(--radius-sm);
+  padding:11px 12px; font-size:0.85rem; line-height:1.5;
+  margin-top:1rem;
 }
-[data-theme="dark"] .error { color: #fca5a5; }
 
+/* ── Submit — full arcade gold press ─────────── */
 .submit {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--gold-400); color: var(--green-900);
-  font-family: var(--font-score); font-size: 0.72rem; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  padding: 15px 24px; border-radius: var(--radius-xs); width: 100%;
-  border: 1px solid var(--gold-500); cursor: pointer; margin-top: 1.25rem;
-  box-shadow: 0 4px 0 var(--gold-600), inset 0 1px 0 rgba(255,255,255,0.25);
-  transition: all var(--t-fast) var(--ease);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  background:var(--gold-400); color:var(--green-900);
+  font-family:var(--font-score); font-size:0.72rem; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase;
+  padding:16px 24px; border-radius:var(--radius-sm); width:100%;
+  border:2px solid var(--gold-500); cursor:pointer; margin-top:1.25rem;
+  min-height:56px;
+  box-shadow:0 5px 0 var(--gold-700), inset 0 1px 0 rgba(255,255,255,0.25);
+  transition:all var(--t-fast) var(--ease);
 }
 .submit:hover:not(:disabled) {
-  background: var(--gold-300);
-  box-shadow: 0 6px 0 var(--gold-600), inset 0 1px 0 rgba(255,255,255,0.3);
-  transform: translateY(-2px);
+  background:var(--gold-300);
+  box-shadow:0 6px 0 var(--gold-700), inset 0 1px 0 rgba(255,255,255,0.3);
+  transform:translateY(-2px);
 }
 .submit:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: 0 0 0 var(--gold-600);
+  transform:translateY(4px);
+  box-shadow:0 1px 0 var(--gold-700);
 }
-.submit:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+.submit:disabled { opacity:0.45; cursor:not-allowed; box-shadow:none; }
 
 .spinner {
-  width: 13px; height: 13px;
-  border: 2px solid color-mix(in srgb, var(--accent-text) 25%, transparent);
-  border-top-color: var(--accent-text); border-radius: 50%;
-  animation: spin 0.7s linear infinite; flex-shrink: 0;
+  width:14px; height:14px;
+  border:2px solid rgba(18,12,4,0.2);
+  border-top-color:var(--green-900); border-radius:50%;
+  animation:spin 0.7s linear infinite; flex-shrink:0;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ─── Mobile ─────────────────────────────────────── */
-@media (max-width: 480px) {
-  .cardContent { padding: 1.25rem 1rem; }
-  .stepRail { min-width: 44px; }
-  .stepBadge { width: 24px; height: 24px; font-size: 0.62rem; }
-}
+@keyframes spin { to { transform:rotate(360deg); } }
