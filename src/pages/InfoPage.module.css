@@ -6,7 +6,7 @@
 
 .chip {
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500;
+  font-family: var(--font-score); font-size: 0.65rem; font-weight: 500;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted);
   margin-bottom: 1rem;
 }
@@ -26,7 +26,7 @@
 }
 
 .lastUpdated {
-  font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);
+  font-family: var(--font-score); font-size: 0.7rem; color: var(--text-muted);
   letter-spacing: 0.04em; margin-top: 0.75rem;
 }
 
@@ -64,7 +64,7 @@
 .ctaText { font-size: 0.9rem; color: var(--text-secondary); }
 .ctaBtn {
   display: inline-flex; align-items: center;
-  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+  font-family: var(--font-score); font-size: 0.72rem; font-weight: 500;
   letter-spacing: 0.06em; text-transform: uppercase;
   background: var(--accent); color: var(--accent-text);
   padding: 10px 20px; border-radius: var(--radius-sm);
@@ -84,7 +84,7 @@
 @media (max-width: 480px) { .formGrid { grid-template-columns: 1fr; } }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
-.label { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.label { font-family: var(--font-score); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
 
 .input {
   height: 44px; padding: 0 13px;
@@ -107,7 +107,7 @@
 
 .submitBtn {
   display: inline-flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500;
+  font-family: var(--font-score); font-size: 0.75rem; font-weight: 500;
   letter-spacing: 0.08em; text-transform: uppercase;
   background: var(--accent); color: var(--accent-text);
   padding: 13px 24px; border-radius: var(--radius-sm);

@@ -42,14 +42,14 @@
 }
 
 .headerChip {
-  font-family: var(--font-mono);
+  font-family: var(--font-score);
   font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--text-muted); background: var(--bg-overlay); border: 1px solid var(--border);
   padding: 4px 10px; border-radius: var(--radius-full);
 }
 
 .headerChipGreen {
-  font-family: var(--font-mono);
+  font-family: var(--font-score);
   font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
@@ -103,7 +103,7 @@
 }
 
 .matchLabel {
-  font-family: var(--font-mono);
+  font-family: var(--font-score);
   font-size: 0.6rem; font-weight: 500; letter-spacing: 0.12em;
   text-transform: uppercase; opacity: 0.4; margin-bottom: 5px;
 }
@@ -144,7 +144,7 @@
 }
 
 .cardLabel {
-  font-family: var(--font-mono);
+  font-family: var(--font-score);
   font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem;
 }
@@ -178,7 +178,7 @@
 .courseAddr { font-size: 0.68rem; color: var(--text-muted); display: block; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .courseTags { display: flex; flex-wrap: wrap; gap: 3px; }
-.courseTag { font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500; padding: 2px 6px; border-radius: var(--radius-xs); background: var(--bg-overlay); color: var(--text-muted); border: 1px solid var(--border); }
+.courseTag { font-family: var(--font-score); font-size: 0.6rem; font-weight: 500; padding: 2px 6px; border-radius: var(--radius-xs); background: var(--bg-overlay); color: var(--text-muted); border: 1px solid var(--border); }
 .courseTagPrice { background: color-mix(in srgb, var(--gold) 10%, transparent); color: var(--gold-600); border-color: color-mix(in srgb, var(--gold) 20%, transparent); }
 [data-theme="dark"] .courseTagPrice { color: var(--gold-300); }
 
@@ -218,13 +218,13 @@
 .waitDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.65; max-width: 340px; margin: 0 auto 1.5rem; }
 .waitProgress { height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 6px; max-width: 220px; margin-left: auto; margin-right: auto; }
 .waitProgressFill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.6s var(--ease); }
-.waitLabel { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.04em; }
+.waitLabel { font-family: var(--font-score); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.04em; }
 
 /* ─── Invite links card ──────────────────── */
 .linksHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem; }
 
 .copyAllBtn {
-  font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500; letter-spacing: 0.05em;
+  font-family: var(--font-score); font-size: 0.65rem; font-weight: 500; letter-spacing: 0.05em;
   color: var(--text-secondary); background: var(--bg-overlay); border: 1px solid var(--border);
   padding: 4px 10px; border-radius: var(--radius-sm);
   transition: all var(--t-base) var(--ease);
@@ -245,7 +245,7 @@
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
   background: color-mix(in srgb, var(--accent) 15%, var(--bg-overlay));
-  color: var(--accent); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+  color: var(--accent); font-family: var(--font-score); font-size: 0.72rem; font-weight: 500;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
@@ -254,7 +254,7 @@
 .playerName { font-size: 0.82rem; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .organizerTag {
-  font-family: var(--font-mono); font-size: 0.58rem; font-weight: 500;
+  font-family: var(--font-score); font-size: 0.58rem; font-weight: 500;
   background: var(--bg-overlay); color: var(--text-muted); border: 1px solid var(--border);
   padding: 1px 5px; border-radius: var(--radius-xs); flex-shrink: 0;
 }
@@ -276,7 +276,7 @@
   display: flex; align-items: center; gap: 7px;
   margin-top: 0.875rem; padding-top: 0.875rem;
   border-top: 1px solid var(--border);
-  font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);
+  font-family: var(--font-score); font-size: 0.65rem; color: var(--text-muted);
   letter-spacing: 0.03em; flex-wrap: wrap;
 }
 
@@ -286,10 +286,10 @@
   border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
   border-radius: var(--radius-lg); padding: 1.125rem 1.25rem;
 }
-.myLinkLabel { font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 5px; }
-.myLinkUrl { font-size: 0.68rem; color: var(--text-secondary); word-break: break-all; margin-bottom: 10px; line-height: 1.55; font-family: var(--font-mono); }
+.myLinkLabel { font-family: var(--font-score); font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 5px; }
+.myLinkUrl { font-size: 0.68rem; color: var(--text-secondary); word-break: break-all; margin-bottom: 10px; line-height: 1.55; font-family: var(--font-score); }
 .myLinkBtn {
-  width: 100%; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+  width: 100%; font-family: var(--font-score); font-size: 0.72rem; font-weight: 500;
   letter-spacing: 0.06em; text-transform: uppercase;
   background: var(--bg-surface); color: var(--text-secondary);
   border: 1px solid var(--border-strong); padding: 10px; border-radius: var(--radius-sm);
