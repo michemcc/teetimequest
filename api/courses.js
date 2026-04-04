@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid lat/lng' })
   }
 
-  const query = `[out:json][timeout:25];
+  const query = `[out:json][timeout:8];
 (
   node["leisure"="golf_course"](around:${radN},${latN},${lngN});
   way["leisure"="golf_course"](around:${radN},${latN},${lngN});
@@ -36,22 +36,22 @@ export default async function handler(req, res) {
 );
 out center tags;`
 
-  // Try multiple Overpass instances in order
+  // Two endpoints, tight timeouts to survive Vercel Hobby 10s limit
+  // First gets 6s, second gets 4s — total budget ~10s including overhead
   const endpoints = [
-    'https://overpass-api.de/api/interpreter',
-    'https://overpass.kumi.systems/api/interpreter',
-    'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+    { url: 'https://overpass-api.de/api/interpreter',        timeout: 6000 },
+    { url: 'https://overpass.kumi.systems/api/interpreter',  timeout: 4000 },
   ]
 
   let lastError = null
 
-  for (const endpoint of endpoints) {
+  for (const { url: endpoint, timeout } of endpoints) {
     try {
       const response = await fetch(endpoint, {
         method:  'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body:    `data=${encodeURIComponent(query)}`,
-        signal:  AbortSignal.timeout(28000),
+        signal:  AbortSignal.timeout(timeout),
       })
 
       if (!response.ok) {

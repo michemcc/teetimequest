@@ -226,39 +226,55 @@ async function _supabase_saveAvailability(roundId, playerId, availability) {
 }
 
 /**
- * Background job: compute the match (slow — hits Nominatim + Overpass)
- * and save it to Supabase. ResultsPage polling fallback and realtime pick it up.
+ * Background job — two-phase approach:
+ *
+ * Phase 1 (instant, <100ms): save a sync match with mock courses immediately.
+ *   → Page transitions right away. No waiting on any API.
+ *
+ * Phase 2 (async, 5-30s): try to upgrade with real OSM courses.
+ *   → If it works, overwrites the match with real courses. Realtime pushes update.
+ *   → If it fails or times out, the mock match stays. No harm done.
  */
 async function _computeAndSaveMatch(roundId, round) {
+  /* ── Phase 1: instant sync match ── */
   try {
-    console.info('[match] Computing match for round', roundId, '...')
-    const match  = await computeMatch(round)
-    const status = match ? 'matched' : 'collecting'
-
-    const { error } = await supabase
-      .from('rounds')
-      .update({ match, status })
-      .eq('id', roundId)
-
-    if (error) {
-      console.error('[match] Failed to save match:', error.message)
-    } else {
-      console.info('[match] Saved successfully for round', roundId,
-        '| courses:', match?.suggestedCourses?.length ?? 0)
-    }
-  } catch (err) {
-    console.error('[match] Background computation failed:', err.message)
-    // Save a minimal match with mock data so the page doesn't wait forever
-    try {
-      const fallbackMatch = computeMatchSync(round)
+    const quickMatch = computeMatchSync(round)
+    if (quickMatch) {
       await supabase
         .from('rounds')
-        .update({ match: fallbackMatch, status: 'matched' })
+        .update({ match: quickMatch, status: 'matched' })
         .eq('id', roundId)
-      console.info('[match] Saved fallback match for round', roundId)
-    } catch (fallbackErr) {
-      console.error('[match] Fallback also failed:', fallbackErr.message)
+      console.info('[match] Phase 1 saved (mock courses) for round', roundId)
     }
+  } catch (err) {
+    console.error('[match] Phase 1 failed:', err.message)
+    return // if even this fails, give up
+  }
+
+  /* ── Phase 2: upgrade with real courses (best-effort, 20s budget) ── */
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 20000) // hard 20s cap
+
+    const realMatch = await Promise.race([
+      computeMatch(round),
+      new Promise((_, reject) =>
+        controller.signal.addEventListener('abort', () => reject(new Error('timeout')))
+      ),
+    ])
+
+    clearTimeout(timeout)
+
+    if (realMatch && realMatch.suggestedCourses?.[0]?.source === 'openstreetmap') {
+      await supabase
+        .from('rounds')
+        .update({ match: realMatch, status: 'matched' })
+        .eq('id', roundId)
+      console.info('[match] Phase 2 saved (real courses) for round', roundId)
+    }
+  } catch (err) {
+    // Phase 2 failure is silent — mock match already saved in Phase 1
+    console.info('[match] Phase 2 skipped:', err.message)
   }
 }
 

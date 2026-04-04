@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import Nav from '../components/Nav'
 import { getRound, subscribeToRound } from '../utils/store'
@@ -61,29 +61,40 @@ export default function ResultsPage() {
     return unsub
   }, [roundId])  // intentionally omit round.status — resubscribing breaks the channel
 
-  /* ── Polling fallback — catches the match if realtime fires during a gap ──
-     When everyone has responded but match is still null (background job running),
-     poll every 3s until it arrives. Stops automatically once matched.        */
+  /* ── Polling fallback — ref-based so cleanup is always reliable ── */
+  const pollRef = useRef(null)
+
   useEffect(() => {
+    // Clear any existing poll
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+
     if (!round) return
     const allResponded = round.players.length > 0 &&
       round.players.every(p => p.availability)
-    const matchPending = allResponded && !round.match
 
-    if (!matchPending) return  // nothing to poll for
+    // Only poll while everyone responded but match hasn't arrived yet
+    if (!allResponded || round.match) return
 
-    const interval = setInterval(async () => {
+    console.info('[poll] Starting 2s poll for match on round', roundId)
+
+    pollRef.current = setInterval(async () => {
       try {
         const fresh = await getRound(roundId)
         if (fresh?.match) {
+          console.info('[poll] Match arrived, stopping poll')
+          clearInterval(pollRef.current)
+          pollRef.current = null
           setRound(fresh)
-          clearInterval(interval)
+          if (fresh.match?.confirmedCourse) setSelectedCourse(fresh.match.confirmedCourse)
         }
       } catch {}
-    }, 3000)
+    }, 2000)  // every 2s — faster than before
 
-    return () => clearInterval(interval)
-  }, [roundId, round?.status, round?.match])
+    return () => {
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+    }
+  // Re-evaluate only when the match status actually changes
+  }, [roundId, round?.match, round?.players?.length])
 
   /* ── Loading / not-found ── */
   if (loading) return (
