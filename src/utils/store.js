@@ -158,14 +158,9 @@ async function _supabase_createRound({
   const allResponded = round.players.every(p => p.availability)
 
   if (allResponded) {
-    const match = await computeMatch(round)
-    const status = match ? 'matched' : 'collecting'
-    await supabase
-      .from('rounds')
-      .update({ match, status })
-      .eq('id', roundId)
-    round.match = match
-    round.status = status
+    // Use two-phase: instant mock match first, real courses upgrade async
+    _computeAndSaveMatch(roundId, round)
+    round.status = 'matched'
   }
 
   return round
@@ -414,7 +409,7 @@ async function _local_createRound({
 
   const allResponded = round.players.every(p => p.availability)
   if (allResponded) {
-    round.match  = await computeMatch(round)
+    round.match  = computeMatchSync(round)
     round.status = round.match ? 'matched' : 'collecting'
   }
 
@@ -435,7 +430,7 @@ async function _local_saveAvailability(roundId, playerId, availability) {
 
   const allResponded = round.players.every(p => p.availability)
   if (allResponded) {
-    round.match  = await computeMatch(round)
+    round.match  = computeMatchSync(round)
     round.status = round.match ? 'matched' : 'collecting'
   }
 
