@@ -26,7 +26,9 @@ export default function ResultsPage() {
   const [loading,        setLoading]        = useState(true)
   const [notFound,       setNotFound]       = useState(false)
   const [copiedId,       setCopiedId]       = useState(null)
-  const [selectedCourse, setSelectedCourse] = useState(null)
+  const [selectedCourse,  setSelectedCourse]  = useState(null)
+  const [matchRevealed,   setMatchRevealed]   = useState(false)
+  const prevMatchRef = useRef(null)
 
   function copy(id, text) {
     copyText(text); setCopiedId(id)
@@ -41,6 +43,7 @@ export default function ResultsPage() {
         if (!r) return setNotFound(true)
         setRound(r)
         if (r.match?.confirmedCourse) setSelectedCourse(r.match.confirmedCourse)
+        if (r.match) setMatchRevealed(true)
       } catch (err) {
         console.error('Failed to load round:', err)
         setNotFound(true)
@@ -55,7 +58,13 @@ export default function ResultsPage() {
   useEffect(() => {
     // Subscribe as soon as round is loaded. Stable dep array = never torn down.
     const unsub = subscribeToRound(roundId, (updated) => {
-      setRound(updated)
+      setRound(prev => {
+        // Trigger reveal animation when match first arrives
+        if (!prev?.match && updated.match) {
+          setTimeout(() => setMatchRevealed(true), 50)
+        }
+        return updated
+      })
       if (updated.match?.confirmedCourse) setSelectedCourse(updated.match.confirmedCourse)
     })
     return unsub
@@ -84,7 +93,10 @@ export default function ResultsPage() {
           console.info('[poll] Match arrived, stopping poll')
           clearInterval(pollRef.current)
           pollRef.current = null
-          setRound(fresh)
+          setRound(prev => {
+            if (!prev?.match && fresh.match) setTimeout(() => setMatchRevealed(true), 50)
+            return fresh
+          })
           if (fresh.match?.confirmedCourse) setSelectedCourse(fresh.match.confirmedCourse)
         }
       } catch {}
@@ -134,12 +146,18 @@ export default function ResultsPage() {
             <span className={styles.headerChip}>Round · {round.city}</span>
             {hasMatch && <span className={styles.headerChipGreen}>Match found</span>}
           </div>
-          <h1 className={styles.title}>
-            {isNew ? 'Round created!' : hasMatch ? "You're on the tee 🏌️" : 'Waiting on the crew…'}
+          <h1 className={`${styles.title} ${hasMatch ? styles.titleMatched : ''}`}>
+            {isNew ? 'Round created! ⛳' : hasMatch ? "You're on the tee." : 'Waiting on the crew…'}
           </h1>
+          {hasMatch && (
+            <div className={styles.headerMatchBadge}>
+              <span className={styles.headerMatchPulse}/>
+              Match found · {round.city}
+            </div>
+          )}
           <p className={styles.subtitle}>
             {hasMatch
-              ? 'All availability collected. Here\'s what we found.'
+              ? `Best date and tee time locked in. ${round.match.suggestedCourses?.length || 0} courses nearby.`
               : `${respondedCount} of ${round.players.length} players have responded. Copy and share the links below!`}
           </p>
         </div>
@@ -147,7 +165,7 @@ export default function ResultsPage() {
         <div className={styles.layout}>
 
           {/* ── Left: results ── */}
-          <div className={styles.leftCol}>
+          <div className={`${styles.leftCol} ${hasMatch && matchRevealed ? styles.leftColRevealed : ""}`}>
 
             {hasMatch && round.match.storyline && (
               <div className={styles.storylineCard}>

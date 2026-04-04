@@ -363,3 +363,74 @@
   border: 1px solid rgba(96,165,250,0.25);
   letter-spacing: 0.06em;
 }
+
+/* ─── Match reveal animation ─────────────── */
+.leftCol {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+
+/* Start hidden/shifted — animate in when match arrives */
+.leftCol > * {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+}
+
+/* Each child staggers in */
+.leftColRevealed > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0ms; }
+.leftColRevealed > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 80ms; }
+.leftColRevealed > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 160ms; }
+.leftColRevealed > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 240ms; }
+.leftColRevealed > *:nth-child(5) { opacity: 1; transform: none; transition-delay: 320ms; }
+
+/* When no match yet — children should be visible (wait card) */
+.leftCol:not(.leftColRevealed) > * {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* ─── Match found header badge ───────────── */
+.titleMatched {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+[data-theme="dark"] .titleMatched {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.headerMatchBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-score);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  padding: 5px 12px;
+  border-radius: var(--radius-xs);
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.headerMatchPulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+  flex-shrink: 0;
+  animation: matchPulse 1.8s ease-in-out infinite;
+}
+@keyframes matchPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--accent); }
+  50%       { opacity: 0.5; box-shadow: 0 0 2px var(--accent); }
+}

@@ -230,6 +230,47 @@ out center tags;`
       city = parts.length >= 2 ? parts.slice(-2).join(', ') : parts[0] || city
     }
 
+    // Generate storyline server-side using player names + real course city
+    const firstNames = normalisedPlayers.map(p => (p.name || '').split(' ')[0]).filter(Boolean)
+    let names
+    if (firstNames.length === 1)      names = firstNames[0]
+    else if (firstNames.length === 2) names = firstNames.join(' and ')
+    else names = firstNames.slice(0, -1).join(', ') + ', and ' + firstNames[firstNames.length - 1]
+
+    let dateStr = chosenDate
+    try {
+      const d = new Date(chosenDate + 'T00:00:00')
+      dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+    } catch {}
+
+    const OPENERS = [
+      "The crew is locked in.",
+      "It's official — the round is on.",
+      "Mark the calendar.",
+      "Game day is coming.",
+      "The fairways await.",
+      "Clubs out, chaos incoming.",
+      "The group chat can finally rest.",
+      "Someone's going home with a story.",
+    ]
+    const FORMATS = [
+      ({ names, city, teeTime, course }) =>
+        `${names} are heading to ${city} for a morning on the links. Tee time is ${teeTime}${course ? ` at ${course}` : ''}. May the best player win, and may everyone else at least pretend to be happy about it.`,
+      ({ names, city, teeTime, course }) =>
+        `${names} have officially committed to ${city}. The ${teeTime} slot is locked in${course ? ` at ${course}` : ''}. Handicaps will be questioned, mulligans will be debated, and at least one person will blame the wind.`,
+      ({ names, city, date, teeTime }) =>
+        `The squad is teeing off in ${city}. ${teeTime} on ${date} — no excuses, no rain checks. ${names} made it happen against all scheduling odds. That's either impressive or slightly concerning.`,
+      ({ names, city, course, teeTime }) =>
+        `${city} better be ready. ${names} are descending on the fairways${course ? ` of ${course}` : ''} at ${teeTime}. Birdies will be attempted. Pars will be celebrated. Bogeys will be diplomatically not mentioned.`,
+      ({ names, city, course, teeTime }) =>
+        `${teeTime} in ${city}${course ? ` at ${course}` : ''}. ${names} finally stopped texting and actually locked in a date. Golf will be played. Stories will be told. Scores may or may not be recorded accurately.`,
+    ]
+
+    const seed   = roundId.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+    const opener = OPENERS[seed % OPENERS.length]
+    const format = FORMATS[(seed + 3) % FORMATS.length]
+    const storyline = opener + ' ' + format({ names, city, date: dateStr, teeTime: chosenTime, course: topCourse?.name || null })
+
     // Build the complete match object — no dependency on Phase 1
     const fullMatch = {
       date:             chosenDate,
@@ -237,7 +278,7 @@ out center tags;`
       commonDatesCount: commonDates.length,
       suggestedCourses: courses,
       confirmedCourse:  null,
-      storyline:        null, // client computes this on display if null
+      storyline,
     }
 
     const patchRes = await fetch(
