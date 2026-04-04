@@ -206,7 +206,7 @@ export default function ResultsPage() {
               <div className={styles.card}>
                 <div className={styles.cardLabel}>Suggested courses nearby</div>
 
-                {/* Skeleton — shown while Phase 2 course lookup is running */}
+                {/* Skeleton — Phase 2 course lookup still running */}
                 {coursesLoading && (
                   <div className={styles.courseSkeleton}>
                     <div className={styles.courseSkeletonIcon}>📍</div>
@@ -218,53 +218,52 @@ export default function ResultsPage() {
                   </div>
                 )}
 
-                {/* Real courses — shown once Phase 2 completes */}
+                {/* Real courses — Phase 2 complete */}
                 {hasRealCourses && (
                   <>
-                  <p className={styles.cardDesc}>Select one to confirm your booking.</p>
-                  <div className={styles.courseList}>
-                  {round.match.suggestedCourses.map(course => (
-                    <button
-                      key={course.id} type="button"
-                      className={`${styles.courseCard} ${selectedCourse === course.id ? styles.courseActive : ''}`}
-                      onClick={() => setSelectedCourse(course.id)}
-                    >
-                      <div className={styles.courseEmoji}>⛳</div>
-                      <div className={styles.courseInfo}>
-                        <div className={styles.courseNameRow}>
-                          <span className={styles.courseName}>{course.name}</span>
-                          {course.rating != null && <span className={styles.courseRating}>★ {course.rating}</span>}
-                        </div>
-                        <span className={styles.courseAddr}>{course.address}</span>
-                        {course.website && (
-                          <a href={course.website} target="_blank" rel="noopener noreferrer" className={styles.courseWebsite}>
-                            Visit website →
-                          </a>
-                        )}
-                        <div className={styles.courseTags}>
-                          <span className={styles.courseTag}>{course.holes || 18} holes</span>
-                          <span className={styles.courseTag}>Par {course.par || 72}</span>
-                          {course.price != null && (
-                            <span className={`${styles.courseTag} ${styles.courseTagPrice}`}>${course.price}/player</span>
-                          )}
-                          {course.distanceMi != null && (
-                            <span className={styles.courseTag}>{course.distanceMi} mi away</span>
-                          )}
-                        </div>
-                      </div>
-                      <div className={`${styles.courseCheck} ${selectedCourse === course.id ? styles.courseCheckActive : ''}`}>
-                        {selectedCourse === course.id ? '✓' : ''}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                {selectedCourse && (
-                  <button className={styles.confirmBtn}>
-                    Confirm {round.match.teeTime} booking
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                  </button>
-                )}
-                  </div>
+                    <p className={styles.cardDesc}>Select one to confirm your booking.</p>
+                    <div className={styles.courseList}>
+                      {round.match.suggestedCourses.map(course => (
+                        <button
+                          key={course.id} type="button"
+                          className={`${styles.courseCard} ${selectedCourse === course.id ? styles.courseActive : ''}`}
+                          onClick={() => setSelectedCourse(course.id)}
+                        >
+                          <div className={styles.courseEmoji}>⛳</div>
+                          <div className={styles.courseInfo}>
+                            <div className={styles.courseNameRow}>
+                              <span className={styles.courseName}>{course.name}</span>
+                              {course.rating != null && <span className={styles.courseRating}>★ {course.rating}</span>}
+                            </div>
+                            <span className={styles.courseAddr}>{course.address}</span>
+                            {course.website && (
+                              <a href={course.website} target="_blank" rel="noopener noreferrer" className={styles.courseWebsite}>
+                                Visit website →
+                              </a>
+                            )}
+                            <div className={styles.courseTags}>
+                              <span className={styles.courseTag}>{course.holes || 18} holes</span>
+                              <span className={styles.courseTag}>Par {course.par || 72}</span>
+                              {course.price != null && (
+                                <span className={`${styles.courseTag} ${styles.courseTagPrice}`}>${course.price}/player</span>
+                              )}
+                              {course.distanceMi != null && (
+                                <span className={styles.courseTag}>{course.distanceMi} mi away</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className={`${styles.courseCheck} ${selectedCourse === course.id ? styles.courseCheckActive : ''}`}>
+                            {selectedCourse === course.id ? '✓' : ''}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    {selectedCourse && (
+                      <button className={styles.confirmBtn}>
+                        Confirm {round.match.teeTime} booking
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                      </button>
+                    )}
                   </>
                 )}
               </div>
