@@ -1,170 +1,173 @@
 /* ══════════════════════════════════════════════════════════════
-   TeeTimeQuest — Design System v2026.2.9
-   Golf Arcade. Bold. Chunky. Mobile-first. Game UI energy.
-   Fairway turf × scorecard cream × arcade gold × flag red.
+   TeeTimeQuest — Design System v2026.3.8
+   Golf Arcade Cabinet. Green felt, gold trim, CRT glow.
+   Every surface feels like a game screen. Still readable.
 ══════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Core palette ── */
-  --green-950: #0a1a0f;
-  --green-900: #102018;
-  --green-800: #1a3323;
-  --green-700: #24472f;
-  --green-600: #2f5c3c;
-  --green-500: #3d784f;
-  --green-400: #5a9e70;
-  --green-300: #82c496;
-  --green-200: #b4ddc0;
-  --green-100: #d9eede;
-  --green-50:  #eef7f1;
+  --green-950: #080f0b;
+  --green-900: #0e1c12;
+  --green-800: #182b1e;
+  --green-700: #223d2a;
+  --green-600: #2c5038;
+  --green-500: #3a6b4a;
+  --green-400: #52905f;
+  --green-300: #78b888;
+  --green-200: #aad4b4;
+  --green-100: #d2ecda;
+  --green-50:  #eaf5ee;
 
-  --sand-950: #231a0e;
-  --sand-900: #362814;
-  --sand-800: #52391c;
-  --sand-700: #6e4d28;
-  --sand-600: #8c6538;
-  --sand-500: #aa7e50;
-  --sand-400: #c49a6e;
+  --sand-950: #1a1208;
+  --sand-900: #2c1e0c;
+  --sand-800: #4a3218;
+  --sand-700: #664828;
+  --sand-600: #886038;
+  --sand-500: #a87a50;
+  --sand-400: #c49870;
   --sand-300: #d8b890;
-  --sand-200: #e9d4b4;
-  --sand-100: #f5ecd8;
-  --sand-50:  #faf6ef;
+  --sand-200: #ecd8b4;
+  --sand-100: #f6edd8;
+  --sand-50:  #fbf7ef;
 
-  --navy-950: #080c18;
-  --navy-900: #0e1428;
-  --navy-800: #162038;
-  --navy-700: #1e2f50;
-  --navy-600: #273e68;
-  --navy-500: #325082;
-  --navy-400: #4a6ea0;
+  --navy-950: #04080f;
+  --navy-900: #080e1c;
+  --navy-800: #101828;
+  --navy-700: #182438;
+  --navy-600: #223450;
+  --navy-500: #2e4870;
+  --navy-400: #3e6090;
 
-  --gold-800: #4a3208;
-  --gold-700: #6e4c0e;
-  --gold-600: #936618;
-  --gold-500: #b88224;
-  --gold-400: #d4a030;
-  --gold-300: #e8bc50;
-  --gold-200: #f5d880;
-  --gold-100: #fdefc0;
-  --gold-50:  #fff9e6;
+  --gold-800: #3c2800;
+  --gold-700: #5c3e08;
+  --gold-600: #7e5810;
+  --gold-500: #a47220;
+  --gold-400: #cc9030;
+  --gold-300: #e2ac50;
+  --gold-200: #f0cc80;
+  --gold-100: #f8e8b4;
+  --gold-50:  #fdf6e0;
 
-  --red-700: #7a1818;
-  --red-600: #9e2424;
-  --red-500: #c03434;
-  --red-400: #d85050;
-  --red-300: #ea8080;
+  --red-700:  #5c1010;
+  --red-600:  #861818;
+  --red-500:  #b02828;
+  --red-400:  #cc4040;
+  --red-300:  #e07070;
+
+  /* ── Electric accent — the "score just went up" colour ── */
+  --electric: #50e890;   /* bright game-screen green */
+  --electric-dim: rgba(80,232,144,0.18);
 
   /* ── Light mode ── */
-  --bg-base:      #f0ece0;   /* warm turf parchment */
-  --bg-surface:   #faf7ee;   /* scorecard */
+  --bg-base:      #eceadf;
+  --bg-surface:   #f8f5ea;
   --bg-raised:    #ffffff;
-  --bg-overlay:   #e6e0ce;
-  --bg-inset:     #dbd3be;
-  --bg-scorecard: #f8f4e8;
+  --bg-overlay:   #e2dece;
+  --bg-inset:     #d4ceba;
+  --bg-scorecard: #f6f2e4;
 
-  --text-primary:   #120f08;
-  --text-secondary: #3a3020;
-  --text-muted:     #7a6c54;
-  --text-invert:    #faf7ee;
+  --text-primary:   #100c06;
+  --text-secondary: #342c1c;
+  --text-muted:     #6e6040;
+  --text-invert:    #f6f2e4;
 
-  --border:       rgba(30,20,8,0.14);
-  --border-strong:rgba(30,20,8,0.26);
-  --border-accent:rgba(30,20,8,0.42);
-  --border-score: rgba(30,20,8,0.18);
+  --border:        rgba(28,18,4,0.14);
+  --border-strong: rgba(28,18,4,0.26);
+  --border-accent: rgba(28,18,4,0.44);
+  --border-score:  rgba(28,18,4,0.18);
 
-  --accent:       #1e5c30;
-  --accent-mid:   #267840;
-  --accent-hover: #144022;
-  --accent-light: #a8d8b8;
-  --accent-text:  #f8f4e8;
+  --accent:       #1a5428;
+  --accent-mid:   #226e34;
+  --accent-hover: #103618;
+  --accent-light: #9cd0ae;
+  --accent-text:  #f6f2e4;
 
-  --flag:         #c03434;
-  --flag-light:   rgba(192,52,52,0.12);
+  --flag:       #b82020;
+  --flag-light: rgba(184,32,32,0.12);
 
-  --gold:         #b88224;
-  --gold-bg:      #fdefc0;
+  --gold:    #a87020;
+  --gold-bg: #f8e8b4;
 
-  --success:      #1e6e38;
-  --success-bg:   #e0f4e8;
-  --warning:      #b88224;
-  --warning-bg:   #fdefc0;
-  --danger:       #c03434;
-  --danger-bg:    #fce8e8;
+  --success:    #186030;
+  --success-bg: #d4f0e0;
+  --warning:    #a87020;
+  --warning-bg: #f8e8b4;
+  --danger:     #b82020;
+  --danger-bg:  #f8d8d8;
 
-  /* ── Fonts ── */
   --font-display: 'DM Serif Display', Georgia, serif;
   --font-body:    'Outfit', system-ui, sans-serif;
   --font-score:   'Space Mono', 'Courier New', monospace;
 
-  /* ── Radii — game UI: square cards, rounded buttons ── */
-  --radius-xs:   1px;
-  --radius-sm:   4px;
-  --radius-md:   8px;
-  --radius-lg:   10px;
-  --radius-xl:   14px;
-  --radius-2xl:  20px;
+  /* ── Radii — pixel-square game UI ── */
+  --radius-xs:   0px;  /* completely square — game panel edges */
+  --radius-sm:   2px;
+  --radius-md:   4px;
+  --radius-lg:   6px;
+  --radius-xl:   10px;
+  --radius-2xl:  16px;
   --radius-full: 9999px;
 
-  /* ── Shadows — deeper for game feel ── */
-  --shadow-xs: 0 1px 3px rgba(18,12,4,0.12);
-  --shadow-sm: 0 2px 8px rgba(18,12,4,0.14), 0 0 0 1px rgba(18,12,4,0.06);
-  --shadow-md: 0 4px 16px rgba(18,12,4,0.16), 0 0 0 1px rgba(18,12,4,0.08);
-  --shadow-lg: 0 8px 28px rgba(18,12,4,0.20), 0 0 0 1px rgba(18,12,4,0.10);
-  --shadow-xl: 0 16px 48px rgba(18,12,4,0.24), 0 0 0 1px rgba(18,12,4,0.12);
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(16,8,0,0.15);
+  --shadow-sm: 0 2px 8px rgba(16,8,0,0.18), 0 0 0 1px rgba(16,8,0,0.06);
+  --shadow-md: 0 4px 16px rgba(16,8,0,0.22), 0 0 0 1px rgba(16,8,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(16,8,0,0.28), 0 0 0 1px rgba(16,8,0,0.10);
+  --shadow-xl: 0 16px 56px rgba(16,8,0,0.34), 0 0 0 1px rgba(16,8,0,0.12);
 
-  /* ── Motion ── */
   --ease:     cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --t-fast: 70ms;
-  --t-base: 150ms;
-  --t-slow: 260ms;
+  --t-fast: 60ms;
+  --t-base: 140ms;
+  --t-slow: 240ms;
 }
 
-/* ══ DARK MODE — arcade cabinet at night ══════════════════════ */
+/* ══ DARK MODE — CRT monitor after midnight ══════════════════ */
 [data-theme="dark"] {
-  --bg-base:      #0a110d;
-  --bg-surface:   #101a12;
-  --bg-raised:    #162019;
-  --bg-overlay:   #1c2a20;
-  --bg-inset:     #233328;
-  --bg-scorecard: #142018;
+  --bg-base:      #060d08;
+  --bg-surface:   #0c1610;
+  --bg-raised:    #121e16;
+  --bg-overlay:   #18281c;
+  --bg-inset:     #1e3022;
+  --bg-scorecard: #101c14;
 
-  --text-primary:   #eef5ec;
-  --text-secondary: #8aaa90;
-  --text-muted:     #4a6450;
+  --text-primary:   #e8f5ec;
+  --text-secondary: #7aaa88;
+  --text-muted:     #3e6048;
 
-  --border:        rgba(140,220,160,0.08);
-  --border-strong: rgba(140,220,160,0.14);
-  --border-accent: rgba(140,220,160,0.26);
-  --border-score:  rgba(140,220,160,0.11);
+  --border:        rgba(80,232,144,0.07);
+  --border-strong: rgba(80,232,144,0.13);
+  --border-accent: rgba(80,232,144,0.24);
+  --border-score:  rgba(80,232,144,0.09);
 
-  --accent:       #3dac5c;
-  --accent-mid:   #2e8848;
-  --accent-hover: #52cc74;
-  --accent-light: rgba(61,172,92,0.18);
-  --accent-text:  #060e08;
+  --accent:       #38c858;
+  --accent-mid:   #2aa048;
+  --accent-hover: #4ee870;
+  --accent-light: rgba(56,200,88,0.16);
+  --accent-text:  #040a06;
 
-  --flag:         #e05050;
-  --flag-light:   rgba(224,80,80,0.15);
+  --flag:       #e04040;
+  --flag-light: rgba(224,64,64,0.14);
 
-  --gold:         #d4a030;
-  --gold-bg:      rgba(212,160,48,0.14);
+  --gold:    #d09030;
+  --gold-bg: rgba(208,144,48,0.14);
 
-  --success:      #3dac5c;
-  --success-bg:   rgba(61,172,92,0.14);
-  --warning:      #d4a030;
-  --warning-bg:   rgba(212,160,48,0.14);
-  --danger:       #e05050;
-  --danger-bg:    rgba(224,80,80,0.14);
+  --success:    #38c858;
+  --success-bg: rgba(56,200,88,0.12);
+  --warning:    #d09030;
+  --warning-bg: rgba(208,144,48,0.12);
+  --danger:     #e04040;
+  --danger-bg:  rgba(224,64,64,0.12);
 
-  --shadow-xs: 0 1px 3px rgba(0,0,0,0.55);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.6), 0 0 0 1px rgba(140,220,160,0.05);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.65), 0 0 0 1px rgba(140,220,160,0.06);
-  --shadow-lg: 0 8px 28px rgba(0,0,0,0.7), 0 0 0 1px rgba(140,220,160,0.07);
-  --shadow-xl: 0 16px 48px rgba(0,0,0,0.75), 0 0 0 1px rgba(140,220,160,0.08);
+  --electric: #50e890;
+  --electric-dim: rgba(80,232,144,0.22);
+
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.6);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,0.65), 0 0 0 1px rgba(80,232,144,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.70), 0 0 0 1px rgba(80,232,144,0.05);
+  --shadow-lg: 0 8px 36px rgba(0,0,0,0.75), 0 0 0 1px rgba(80,232,144,0.06);
+  --shadow-xl: 0 16px 64px rgba(0,0,0,0.80), 0 0 0 1px rgba(80,232,144,0.07);
 }
 
-/* ── Reset ─────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
@@ -173,36 +176,41 @@ html {
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
   overflow-x: hidden;
-  width: 100%;
 }
 
 body {
   font-family: var(--font-body);
-  background: var(--bg-base);
+  background-color: var(--bg-base);
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
-  transition: background var(--t-slow) var(--ease), color var(--t-slow) var(--ease);
-  /* Fairway turf diagonal stripes — more visible than before */
-  background-image: repeating-linear-gradient(
-    135deg,
-    transparent,
-    transparent 28px,
-    rgba(30,92,48,0.035) 28px,
-    rgba(30,92,48,0.035) 29px
-  );
+  transition: background-color var(--t-slow) var(--ease), color var(--t-slow) var(--ease);
+  /* Fine felt texture — golf green surface */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 3px,
+      rgba(28,18,4,0.018) 3px, rgba(28,18,4,0.018) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent, transparent 3px,
+      rgba(28,18,4,0.012) 3px, rgba(28,18,4,0.012) 4px
+    );
 }
 [data-theme="dark"] body {
-  background-image: repeating-linear-gradient(
-    135deg,
-    transparent,
-    transparent 28px,
-    rgba(61,172,92,0.055) 28px,
-    rgba(61,172,92,0.055) 29px
-  );
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent, transparent 3px,
+      rgba(80,232,144,0.025) 3px, rgba(80,232,144,0.025) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent, transparent 3px,
+      rgba(80,232,144,0.018) 3px, rgba(80,232,144,0.018) 4px
+    );
 }
 
 h1,h2,h3,h4 { font-family: var(--font-display); line-height: 1.1; letter-spacing: -0.01em; }
@@ -211,26 +219,22 @@ button { cursor: pointer; font-family: var(--font-body); border: none; backgroun
 input, textarea { font-family: var(--font-body); color: var(--text-primary); }
 img { max-width: 100%; display: block; }
 
-/* ── Layout ─────────────────────────────────── */
 .container { width:100%; max-width:1200px; margin:0 auto; padding:0 1.25rem; box-sizing:border-box; }
 @media (max-width:480px) { .container { padding:0 1rem; } }
 @media (max-width:360px) { .container { padding:0 0.875rem; } }
 .container--narrow { max-width:760px; }
 .container--xs     { max-width:560px; }
 
-/* ── Focus ── */
-:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:var(--radius-xs); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width:4px; height:4px; }
-::-webkit-scrollbar-track { background:var(--bg-overlay); }
-::-webkit-scrollbar-thumb { background:var(--accent-light); border-radius:99px; }
-::-webkit-scrollbar-thumb:hover { background:var(--accent); }
+/* Thin game-style scrollbar */
+::-webkit-scrollbar { width:3px; height:3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius:0; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--electric); box-shadow: 0 0 4px var(--electric); }
 
-/* ── Selection ── */
-::selection { background:var(--accent-light); color:var(--text-primary); }
+::selection { background: var(--accent-light); color: var(--text-primary); }
 
-/* ── iOS/Android zoom prevention ── */
 @media (max-width: 768px) {
   input, textarea, select { font-size: 1rem !important; }
 }

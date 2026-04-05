@@ -76,79 +76,149 @@
 
 .leftCol, .rightCol { display: flex; flex-direction: column; gap: 1rem; }
 
-/* ─── Match card ─────────────────────────── */
+/* ─── Match card — game win screen ───────── */
 .matchCard {
-  background: var(--navy-800, #1c2d3f);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem 1.75rem;
-  color: var(--sand-100, #f4ede0);
+  background: var(--green-950);
+  color: var(--sand-100);
   position: relative; overflow: hidden;
+  /* Double-border pixel bezel */
+  border: 2px solid var(--gold-400);
+  box-shadow:
+    0 0 0 1px var(--gold-700),
+    0 0 0 4px var(--green-950),
+    0 0 0 5px rgba(204,144,48,0.25),
+    var(--shadow-xl);
 }
 [data-theme="dark"] .matchCard {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-strong);
+  background: var(--navy-950);
+  border-color: var(--electric);
   color: var(--text-primary);
+  box-shadow:
+    0 0 0 1px rgba(80,232,144,0.3),
+    0 0 0 4px var(--navy-950),
+    0 0 0 5px rgba(80,232,144,0.1),
+    0 0 60px rgba(80,232,144,0.06),
+    var(--shadow-xl);
 }
-/* Gold shimmer stripe */
+/* Scanline overlay */
 .matchCard::before {
   content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 2px,
+    rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 3px
+  );
+}
+/* Gold top bar */
+.matchCard::after {
+  content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, var(--gold-400), var(--gold-300) 40%, transparent 80%);
+  background: linear-gradient(90deg, var(--gold-400), var(--gold-300) 50%, var(--gold-400));
+}
+[data-theme="dark"] .matchCard::after {
+  background: linear-gradient(90deg, transparent, var(--electric), transparent);
+  box-shadow: 0 0 12px var(--electric);
 }
 
 .matchGrid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 1rem; margin-bottom: 1.25rem; align-items: start;
+  gap: 0;
+  border-bottom: 1px solid rgba(204,144,48,0.2);
+  position: relative; z-index: 1;
 }
+[data-theme="dark"] .matchGrid { border-bottom-color: rgba(80,232,144,0.12); }
+
+/* Each cell is its own dark panel */
+.matchGrid > div { padding: 1.25rem 1.5rem; }
 
 .matchLabel {
   font-family: var(--font-score);
-  font-size: 0.6rem; font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; opacity: 0.4; margin-bottom: 5px;
+  font-size: 0.5rem; font-weight: 700; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold-300); margin-bottom: 6px;
 }
+[data-theme="dark"] .matchLabel { color: var(--electric); opacity: 0.6; }
 
 .matchDate {
-  font-family: var(--font-display);
-  font-size: clamp(1rem, 3vw, 1.4rem);
-  font-weight: 400; font-style: italic;
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(1.05rem, 3vw, 1.4rem); font-weight: 400;
+  color: var(--sand-100);
+  text-shadow: 0 0 20px rgba(246,237,216,0.15);
 }
+[data-theme="dark"] .matchDate { color: var(--electric); text-shadow: 0 0 16px rgba(80,232,144,0.25); }
+
+.matchTeeTime { border-left: 1px solid rgba(204,144,48,0.2); }
+[data-theme="dark"] .matchTeeTime { border-left-color: rgba(80,232,144,0.12); }
 
 .matchTimeValue {
-  font-family: var(--font-display);
-  font-size: clamp(1.3rem, 4vw, 1.8rem);
-  font-weight: 400; font-style: italic;
-  color: var(--gold); text-align: right;
+  font-family: var(--font-score);
+  font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--gold-300);
+  text-shadow: 0 0 24px rgba(204,144,48,0.55), 0 2px 0 rgba(0,0,0,0.4);
+  text-align: right;
+}
+[data-theme="dark"] .matchTimeValue {
+  color: var(--electric);
+  text-shadow: 0 0 24px rgba(80,232,144,0.6), 0 2px 0 rgba(0,0,0,0.5);
 }
 
 .matchMeta {
   display: flex; gap: 1.25rem; flex-wrap: wrap;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 0.6rem 1.5rem;
+  background: rgba(0,0,0,0.25);
+  border-top: 1px solid rgba(204,144,48,0.15);
+  position: relative; z-index: 1;
 }
-[data-theme="dark"] .matchMeta { border-top-color: var(--border); }
+[data-theme="dark"] .matchMeta { background: rgba(80,232,144,0.04); border-top-color: rgba(80,232,144,0.1); }
 
 .matchMetaItem {
   display: flex; align-items: center; gap: 6px;
-  font-size: 0.78rem; opacity: 0.55;
+  font-family: var(--font-score);
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold-300); opacity: 0.7;
 }
+[data-theme="dark"] .matchMetaItem { color: var(--electric); opacity: 0.5; }
 .matchMetaIcon { font-size: 0.85rem; }
 
-/* ─── Generic card ───────────────────────── */
+/* ─── Generic card — game panel ─────────── */
 .card {
   background: var(--bg-surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem 1.5rem;
-  transition: background var(--t-slow) var(--ease);
+  border: 2px solid var(--border-strong);
+  padding: 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+[data-theme="dark"] .card {
+  background: var(--bg-surface);
+  border-color: var(--border-strong);
 }
 
 .cardLabel {
   font-family: var(--font-score);
-  font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.3rem;
+  font-size: 0.56rem; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase;
+  /* Header stripe — game panel title bar */
+  background: var(--green-800);
+  color: var(--gold-300);
+  padding: 8px 1.25rem;
+  border-bottom: 1px solid var(--gold-700);
+  display: block;
 }
-.cardDesc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.5; }
+[data-theme="dark"] .cardLabel {
+  background: var(--bg-overlay);
+  color: var(--electric);
+  border-bottom-color: rgba(80,232,144,0.15);
+}
+
+/* Card body gets its own padding */
+.card > *:not(.cardLabel) { padding-left: 1.25rem; padding-right: 1.25rem; }
+.card > .cardDesc { padding-top: 0.875rem; }
+.card > .courseList { padding-bottom: 1.25rem; }
+.card > .confirmBtn { margin-left: 1.25rem; margin-right: 1.25rem; margin-bottom: 1.25rem; width: calc(100% - 2.5rem); }
+
+.cardDesc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.875rem; line-height: 1.5; padding-top: 0.875rem; }
 
 /* ─── Courses ────────────────────────────── */
 .courseList { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
@@ -305,36 +375,49 @@
   .myLinkCard { padding: 1rem; }
 }
 
-/* ─── Storyline card ─────────────────────── */
+/* ─── Storyline card — narrative panel ───── */
 .storylineCard {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
-  background: var(--navy-800, #1c2d3f);
-  border-radius: var(--radius-lg);
+  background: var(--green-950);
+  border: 2px solid var(--gold-500);
+  box-shadow:
+    0 0 0 1px var(--gold-800),
+    0 0 0 3px var(--green-950),
+    0 0 0 4px rgba(204,144,48,0.2),
+    var(--shadow-md);
   padding: 1.25rem 1.5rem;
-  border: 1px solid rgba(201,160,58,0.25);
-  box-shadow: 0 0 0 1px rgba(201,160,58,0.08);
+  position: relative; overflow: hidden;
 }
 [data-theme="dark"] .storylineCard {
-  background: var(--bg-raised);
-  border-color: var(--gold);
+  background: var(--navy-950);
+  border-color: rgba(80,232,144,0.4);
+  box-shadow:
+    0 0 0 1px rgba(80,232,144,0.1),
+    0 0 0 3px var(--navy-950),
+    0 0 0 4px rgba(80,232,144,0.08),
+    0 0 30px rgba(80,232,144,0.05);
+}
+.storylineCard::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-300), transparent);
+}
+[data-theme="dark"] .storylineCard::before {
+  background: linear-gradient(90deg, transparent, var(--electric), transparent);
+  box-shadow: 0 0 8px var(--electric);
 }
 
 .storylineIcon {
-  font-size: 1.4rem;
-  flex-shrink: 0;
-  line-height: 1;
-  margin-top: 2px;
+  font-size: 1.4rem; flex-shrink: 0; line-height: 1; margin-top: 2px;
+  filter: drop-shadow(0 0 6px rgba(204,144,48,0.4));
 }
 
 .storylineText {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: clamp(0.9rem, 2.5vw, 1.05rem);
-  color: var(--sand-100, #f4ede0);
-  line-height: 1.65;
-  letter-spacing: 0.01em;
+  font-family: var(--font-display); font-style: italic;
+  font-size: clamp(0.88rem, 2.5vw, 1.02rem);
+  color: var(--sand-100); line-height: 1.65; letter-spacing: 0.01em;
 }
 [data-theme="dark"] .storylineText { color: var(--text-primary); }
 
