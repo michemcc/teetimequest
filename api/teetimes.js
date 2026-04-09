@@ -5,15 +5,17 @@
  * Proxies GolfCourseAPI /v1/courses/{id}/teetimes server-side
  * so the API key never reaches the browser.
  *
- * Returns normalised slots:
+ * GolfCourseAPI teetimes response shape:
  * {
- *   slots: [
- *     { time: "08:24", price: 85, players: 4, available: true, raw: {...} }
- *   ],
- *   source: "golfcourseapi" | "unavailable"
+ *   "teetimes": [
+ *     {
+ *       "teetime": "2026-04-15T08:24:00",  ← full ISO datetime
+ *       "available_spots": 4,
+ *       "green_fee": 65.00,
+ *       "cart_fee": 20.00
+ *     }
+ *   ]
  * }
- *
- * Env var required: GOLF_COURSE_API_KEY
  */
 
 export default async function handler(req, res) {
@@ -27,14 +29,12 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GOLF_COURSE_API_KEY
   if (!apiKey) {
-    // Key not set — return unavailable gracefully so UI can degrade
     return res.status(200).json({ slots: [], source: 'no-api-key' })
   }
 
-  // courseId is prefixed "gcapi-{id}" — extract the numeric id
+  // courseId is prefixed "gcapi-{id}" — extract the numeric part
   const numericId = courseId.replace(/^gcapi-/, '')
   if (!numericId || isNaN(Number(numericId))) {
-    // OSM course IDs (no gcapi- prefix) don't support tee time lookup
     return res.status(200).json({ slots: [], source: 'osm-course' })
   }
 
@@ -42,6 +42,8 @@ export default async function handler(req, res) {
     const url = new URL(`https://api.golfcourseapi.com/v1/courses/${numericId}/teetimes`)
     url.searchParams.set('date',    date)
     url.searchParams.set('players', players)
+
+    console.info(`[teetimes] Fetching: ${url.toString()}`)
 
     const apiRes = await fetch(url.toString(), {
       headers: {
@@ -52,61 +54,85 @@ export default async function handler(req, res) {
     })
 
     if (apiRes.status === 404) {
-      // Course exists but doesn't have tee time data via GCAPI
+      console.info(`[teetimes] 404 — course ${numericId} has no tee time data`)
       return res.status(200).json({ slots: [], source: 'no-teetimes' })
     }
 
     if (!apiRes.ok) {
       const body = await apiRes.text().catch(() => '')
-      console.warn(`[teetimes] HTTP ${apiRes.status}: ${body.slice(0, 200)}`)
+      console.warn(`[teetimes] HTTP ${apiRes.status}: ${body.slice(0, 300)}`)
       return res.status(200).json({ slots: [], source: 'api-error', status: apiRes.status })
     }
 
     const data = await apiRes.json()
 
-    // GolfCourseAPI teetimes response shape:
-    // { teetimes: [ { teetime: "08:24:00", price: 85, available_spots: 4, ... } ] }
-    const raw = Array.isArray(data.teetimes) ? data.teetimes :
-                Array.isArray(data)          ? data          : []
+    // Log the raw shape so we can see exactly what the API returns in Vercel logs
+    const rawArray = Array.isArray(data.teetimes) ? data.teetimes
+                   : Array.isArray(data)           ? data
+                   : []
+    console.info(`[teetimes] Raw response keys: ${Object.keys(data).join(', ')}`)
+    console.info(`[teetimes] Raw teetimes count: ${rawArray.length}`)
+    if (rawArray[0]) {
+      console.info(`[teetimes] First slot sample: ${JSON.stringify(rawArray[0])}`)
+    }
 
     const playerCount = parseInt(players) || 4
 
-    const slots = raw
+    const slots = rawArray
       .filter(t => {
-        // Must have enough spots for the group
-        const spots = t.available_spots ?? t.spots_available ?? t.available ?? 99
-        return spots >= playerCount
+        // Don't filter on spots too strictly — some courses don't return this field
+        const spots = t.available_spots ?? t.spots_available ?? t.spots ?? null
+        if (spots !== null && spots < playerCount) return false
+        return true
       })
       .map(t => {
-        // Normalise time — API returns "08:24:00" or "08:24"
-        const rawTime = t.teetime || t.time || t.tee_time || ''
-        const timeParts = rawTime.split(':')
-        let hour = parseInt(timeParts[0]) || 0
-        const min  = timeParts[1] || '00'
-        const ampm = hour >= 12 ? 'PM' : 'AM'
-        if (hour > 12) hour -= 12
-        if (hour === 0) hour = 12
-        const displayTime = `${hour}:${min} ${ampm}`
+        // teetime is a full ISO datetime: "2026-04-15T08:24:00"
+        // OR just a time string: "08:24" or "08:24:00"
+        const rawTime = t.teetime || t.tee_time || t.time || t.start_time || ''
 
-        // Price — may be per-player or total
-        const priceRaw = t.price ?? t.rate ?? t.green_fee ?? null
-        const price    = priceRaw != null ? Math.round(Number(priceRaw)) : null
+        let displayTime = rawTime  // fallback
+
+        if (rawTime.includes('T')) {
+          // ISO datetime — extract the time part after T
+          const timePart = rawTime.split('T')[1] || ''           // "08:24:00"
+          const [h, m]   = timePart.split(':').map(Number)       // [8, 24]
+          if (!isNaN(h) && !isNaN(m)) {
+            const ampm = h >= 12 ? 'PM' : 'AM'
+            const hour = h % 12 === 0 ? 12 : h % 12
+            displayTime = `${hour}:${String(m).padStart(2, '0')} ${ampm}`
+          }
+        } else if (rawTime.match(/^\d{1,2}:\d{2}/)) {
+          // Plain time string "08:24" or "08:24:00"
+          const [h, m] = rawTime.split(':').map(Number)
+          if (!isNaN(h) && !isNaN(m)) {
+            const ampm = h >= 12 ? 'PM' : 'AM'
+            const hour = h % 12 === 0 ? 12 : h % 12
+            displayTime = `${hour}:${String(m).padStart(2, '0')} ${ampm}`
+          }
+        }
+
+        // Price — GolfCourseAPI uses green_fee + optional cart_fee
+        const greenFee = t.green_fee ?? t.price ?? t.rate ?? null
+        const cartFee  = t.cart_fee  ?? t.cart  ?? 0
+        const price    = greenFee != null
+          ? Math.round(Number(greenFee) + Number(cartFee))
+          : null
 
         return {
-          time:      displayTime,
-          timeRaw:   rawTime,
+          time:    displayTime,
+          timeRaw: rawTime,
           price,
-          players:   t.available_spots ?? t.spots_available ?? playerCount,
+          players: t.available_spots ?? t.spots ?? playerCount,
           available: true,
         }
       })
-      // Sort chronologically
+      .filter(s => s.time && s.time !== '')
+      // Sort chronologically by raw time string
       .sort((a, b) => a.timeRaw.localeCompare(b.timeRaw))
 
-    // Cache: tee times change, but 2 min cache is fine to reduce hammering
-    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=60')
+    console.info(`[teetimes] Returning ${slots.length} slots for course ${numericId} on ${date}`)
 
-    console.info(`[teetimes] course=${numericId} date=${date} players=${players} slots=${slots.length}`)
+    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=60')
     return res.status(200).json({ slots, source: 'golfcourseapi' })
 
   } catch (err) {

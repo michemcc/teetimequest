@@ -62,6 +62,7 @@ export default function ResultsPage() {
         `/api/teetimes?courseId=${encodeURIComponent(courseId)}&date=${date}&players=${players}`
       )
       const data = await res.json()
+      console.info('[teetimes] response:', data.source, '| slots:', data.slots?.length, data.slots?.[0])
       setTeeSlots(data.slots || [])
       setTeeSlotsSource(data.source || 'unknown')
     } catch (err) {
