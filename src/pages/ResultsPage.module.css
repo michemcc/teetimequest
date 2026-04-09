@@ -430,6 +430,7 @@
   text-decoration: none;
   display: block;
   margin-top: 3px;
+  margin-bottom: 7px;
   transition: color var(--t-base) var(--ease);
 }
 .courseWebsite:hover { color: var(--accent-hover); text-decoration: underline; }
@@ -587,3 +588,138 @@
   border: 1px solid rgba(212,160,48,0.3); letter-spacing: 0.06em;
 }
 [data-theme="dark"] .courseTagGcapi { color: var(--gold); background: rgba(212,160,48,0.12); }
+
+/* ═══════════════════════════════════════════════════════════
+   TEE TIME AVAILABILITY PANEL
+═══════════════════════════════════════════════════════════ */
+
+.teeTimes {
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--border-strong);
+  background: var(--bg-overlay);
+}
+[data-theme="dark"] .teeTimes {
+  background: var(--bg-inset);
+  border-top-color: var(--border-strong);
+}
+
+/* ── Header row ─────────────────────────────── */
+.teeTimesHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.875rem;
+}
+
+.teeTimesLabel {
+  font-family: var(--font-score);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.teeTimesSpinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Skeleton rows ──────────────────────────── */
+.teeSlotsLoading { display: flex; flex-direction: column; gap: 6px; }
+
+.teeSlotsSkeleton {
+  height: 42px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-inset) 25%,
+    var(--bg-overlay) 50%,
+    var(--bg-inset) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ── Note text for no-data states ───────────── */
+.teeTimesNote {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  padding: 0.5rem 0;
+}
+
+/* ── Slot grid ──────────────────────────────── */
+.teeSlotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.teeSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 6px;
+  border: 2px solid var(--border-strong);
+  background: var(--bg-surface);
+  cursor: pointer;
+  min-height: 52px;
+  touch-action: manipulation;
+  /* Hard pixel shadow — arcade button */
+  box-shadow: 0 2px 0 var(--bg-inset);
+  transition: all var(--t-fast) var(--ease);
+}
+.teeSlot:hover {
+  border-color: var(--accent);
+  box-shadow: 0 3px 0 var(--accent-hover);
+  transform: translateY(-1px);
+}
+.teeSlot:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+[data-theme="dark"] .teeSlot { background: var(--bg-raised); }
+[data-theme="dark"] .teeSlot:hover { border-color: var(--electric); box-shadow: 0 3px 0 rgba(56,200,88,0.3); }
+
+.teeSlotActive {
+  background: var(--accent) !important;
+  border-color: var(--accent-hover) !important;
+  box-shadow: 0 2px 0 var(--accent-hover), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+}
+[data-theme="dark"] .teeSlotActive {
+  background: var(--electric) !important;
+  border-color: rgba(56,200,88,0.6) !important;
+  box-shadow: 0 2px 0 #1a6e38, 0 0 12px rgba(80,232,144,0.3) !important;
+}
+
+.teeSlotTime {
+  font-family: var(--font-score);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.teeSlotActive .teeSlotTime { color: var(--accent-text); }
+[data-theme="dark"] .teeSlotActive .teeSlotTime { color: var(--green-950); }
+
+.teeSlotPrice {
+  font-family: var(--font-score);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+}
+.teeSlotActive .teeSlotPrice { color: rgba(255,255,255,0.75); }
+[data-theme="dark"] .teeSlotActive .teeSlotPrice { color: var(--green-800); }

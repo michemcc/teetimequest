@@ -28,11 +28,48 @@ export default function ResultsPage() {
   const [copiedId,       setCopiedId]       = useState(null)
   const [selectedCourse,  setSelectedCourse]  = useState(null)
   const [matchRevealed,   setMatchRevealed]   = useState(false)
+  const [teeSlots,        setTeeSlots]        = useState([])        // real availability slots
+  const [teeSlotsLoading, setTeeSlotsLoading] = useState(false)
+  const [teeSlotsSource,  setTeeSlotsSource]  = useState(null)      // 'golfcourseapi' | etc
+  const [selectedSlot,    setSelectedSlot]    = useState(null)      // chosen tee time slot
   const prevMatchRef = useRef(null)
 
   function copy(id, text) {
     copyText(text); setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  /* ── Fetch real tee time slots when a course is selected ── */
+  async function selectCourse(courseId) {
+    setSelectedCourse(courseId)
+    setSelectedSlot(null)
+    setTeeSlots([])
+    setTeeSlotsSource(null)
+
+    if (!courseId || !round?.match?.date) return
+
+    // Only GolfCourseAPI courses have tee time data (id starts with gcapi-)
+    if (!courseId.startsWith('gcapi-')) {
+      setTeeSlotsSource('osm-course')
+      return
+    }
+
+    setTeeSlotsLoading(true)
+    try {
+      const date    = round.match.date
+      const players = round.players.length
+      const res = await fetch(
+        `/api/teetimes?courseId=${encodeURIComponent(courseId)}&date=${date}&players=${players}`
+      )
+      const data = await res.json()
+      setTeeSlots(data.slots || [])
+      setTeeSlotsSource(data.source || 'unknown')
+    } catch (err) {
+      console.warn('[teetimes] fetch failed:', err.message)
+      setTeeSlotsSource('error')
+    } finally {
+      setTeeSlotsLoading(false)
+    }
   }
 
   /* ── Initial load ── */
@@ -227,7 +264,7 @@ export default function ResultsPage() {
                         <button
                           key={course.id} type="button"
                           className={`${styles.courseCard} ${selectedCourse === course.id ? styles.courseActive : ''}`}
-                          onClick={() => setSelectedCourse(course.id)}
+                          onClick={() => selectCourse(course.id)}
                         >
                           <div className={styles.courseEmoji}>⛳</div>
                           <div className={styles.courseInfo}>
@@ -258,11 +295,67 @@ export default function ResultsPage() {
                         </button>
                       ))}
                     </div>
+                    {/* ── Tee time availability panel ── */}
                     {selectedCourse && (
-                      <button className={styles.confirmBtn}>
-                        Confirm {round.match.teeTime} booking
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                      </button>
+                      <div className={styles.teeTimes}>
+                        <div className={styles.teeTimesHeader}>
+                          <span className={styles.teeTimesLabel}>Available tee times · {round.match.date}</span>
+                          {teeSlotsLoading && <span className={styles.teeTimesSpinner}/>}
+                        </div>
+
+                        {/* Loading */}
+                        {teeSlotsLoading && (
+                          <div className={styles.teeSlotsLoading}>
+                            <div className={styles.teeSlotsSkeleton}/>
+                            <div className={styles.teeSlotsSkeleton}/>
+                            <div className={styles.teeSlotsSkeleton}/>
+                          </div>
+                        )}
+
+                        {/* No tee time data for this course type */}
+                        {!teeSlotsLoading && teeSlotsSource === 'osm-course' && (
+                          <p className={styles.teeTimesNote}>
+                            Live tee times are available for GolfCourseAPI listings.
+                            Check the course website to book.
+                          </p>
+                        )}
+
+                        {/* No slots returned */}
+                        {!teeSlotsLoading && teeSlotsSource === 'golfcourseapi' && teeSlots.length === 0 && (
+                          <p className={styles.teeTimesNote}>
+                            No available tee times found for {round.players.length} players on this date.
+                            Try calling the course directly.
+                          </p>
+                        )}
+
+                        {/* Real tee time slots */}
+                        {!teeSlotsLoading && teeSlots.length > 0 && (
+                          <div className={styles.teeSlotGrid}>
+                            {teeSlots.map(slot => (
+                              <button
+                                key={slot.timeRaw}
+                                type="button"
+                                className={`${styles.teeSlot} ${selectedSlot?.timeRaw === slot.timeRaw ? styles.teeSlotActive : ''}`}
+                                onClick={() => setSelectedSlot(slot)}
+                              >
+                                <span className={styles.teeSlotTime}>{slot.time}</span>
+                                {slot.price != null && (
+                                  <span className={styles.teeSlotPrice}>${slot.price}</span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Confirm button — only when a real slot is chosen */}
+                        {selectedSlot && (
+                          <button className={styles.confirmBtn}>
+                            ⛳ Lock in {selectedSlot.time}
+                            {selectedSlot.price != null && ` · $${selectedSlot.price * round.players.length} total`}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                          </button>
+                        )}
+                      </div>
                     )}
                   </>
                 )}

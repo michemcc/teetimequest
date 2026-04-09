@@ -291,7 +291,7 @@ function computeMatchSync(round) {
   const teeTime = candidates[Math.floor(Math.random() * candidates.length)]
 
   const shuffled = [...MOCK_COURSES].sort(() => (round.id.charCodeAt(0) % 2 === 0 ? 1 : -1))
-  const storyline = generateStoryline(round, common[0], teeTime, shuffled[0])
+  const storyline = generateStoryline(round, common[0], teeTime, null)
 
   return { date: common[0], teeTime, commonDatesCount: common.length,
            suggestedCourses: shuffled.slice(0,3), confirmedCourse: null, storyline }
