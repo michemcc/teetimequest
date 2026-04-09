@@ -723,3 +723,14 @@
 }
 .teeSlotActive .teeSlotPrice { color: rgba(255,255,255,0.75); }
 [data-theme="dark"] .teeSlotActive .teeSlotPrice { color: var(--green-800); }
+
+.cardDescNote {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.875rem;
+  line-height: 1.5;
+  padding-top: 0.875rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  font-style: italic;
+}

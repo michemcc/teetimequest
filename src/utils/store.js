@@ -251,14 +251,17 @@ async function _computeAndSaveMatch(roundId, round) {
      It geocodes, hits Overpass, filters private clubs, and patches
      the round with real courses. Realtime subscription picks it up.    */
   try {
+    console.info('[match] Firing Phase 2 /api/match for round', roundId)
     fetch('/api/match', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ roundId }),
-    }).then(r => r.json()).then(d => {
-      console.info('[match] Phase 2 result:', d)
+    }).then(async r => {
+      const d = await r.json()
+      console.info('[match] Phase 2 result:', d.source, '| courses:', d.courses, '| ok:', d.ok)
+      if (!d.ok) console.warn('[match] Phase 2 non-ok:', d)
     }).catch(err => {
-      console.info('[match] Phase 2 call failed (non-critical):', err.message)
+      console.warn('[match] Phase 2 fetch error:', err.message)
     })
   } catch {
     // Phase 2 is fire-and-forget — Phase 1 mock match already saved

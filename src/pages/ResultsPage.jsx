@@ -28,11 +28,13 @@ export default function ResultsPage() {
   const [copiedId,       setCopiedId]       = useState(null)
   const [selectedCourse,  setSelectedCourse]  = useState(null)
   const [matchRevealed,   setMatchRevealed]   = useState(false)
-  const [teeSlots,        setTeeSlots]        = useState([])        // real availability slots
+  const [teeSlots,        setTeeSlots]        = useState([])
   const [teeSlotsLoading, setTeeSlotsLoading] = useState(false)
-  const [teeSlotsSource,  setTeeSlotsSource]  = useState(null)      // 'golfcourseapi' | etc
-  const [selectedSlot,    setSelectedSlot]    = useState(null)      // chosen tee time slot
+  const [teeSlotsSource,  setTeeSlotsSource]  = useState(null)
+  const [selectedSlot,    setSelectedSlot]    = useState(null)
+  const [coursesTimedOut, setCoursesTimedOut] = useState(false)  // skeleton fallback
   const prevMatchRef = useRef(null)
+  const coursesTimeoutRef = useRef(null)
 
   function copy(id, text) {
     copyText(text); setCopiedId(id)
@@ -108,6 +110,28 @@ export default function ResultsPage() {
     return unsub
   }, [roundId])  // intentionally omit round.status — resubscribing breaks the channel
 
+  /* ── Courses skeleton timeout — don't spin forever ── */
+  useEffect(() => {
+    if (!hasMatch) return
+    if (hasRealCourses) {
+      // Real courses arrived — clear any pending timeout
+      if (coursesTimeoutRef.current) {
+        clearTimeout(coursesTimeoutRef.current)
+        coursesTimeoutRef.current = null
+      }
+      setCoursesTimedOut(false)
+      return
+    }
+    // Start 18s timer — if real courses haven't arrived by then, show mock
+    coursesTimeoutRef.current = setTimeout(() => {
+      console.warn('[courses] Timed out waiting for real courses — showing mock data')
+      setCoursesTimedOut(true)
+    }, 18000)
+    return () => {
+      if (coursesTimeoutRef.current) clearTimeout(coursesTimeoutRef.current)
+    }
+  }, [hasMatch, hasRealCourses])
+
   /* ── Polling fallback — ref-based so cleanup is always reliable ── */
   const pollRef = useRef(null)
 
@@ -174,7 +198,9 @@ export default function ResultsPage() {
   const organizer       = round.players.find(p => p.isOrganizer)
   // True only when real OSM courses have arrived (Phase 2 complete)
   const hasRealCourses  = round.match?.suggestedCourses?.some(c => c.source === 'openstreetmap' || c.source === 'golfcourseapi')
-  const coursesLoading  = hasMatch && !hasRealCourses
+  const coursesLoading  = hasMatch && !hasRealCourses && !coursesTimedOut
+  // When timed out, show mock courses with a note
+  const showMockCourses = hasMatch && !hasRealCourses && coursesTimedOut
 
   return (
     <div className={styles.page}>
@@ -266,10 +292,15 @@ export default function ResultsPage() {
                   </div>
                 )}
 
-                {/* Real courses — Phase 2 complete */}
-                {hasRealCourses && (
+                {/* Real courses — Phase 2 complete, or timed out showing mock */}
+                {(hasRealCourses || showMockCourses) && (
                   <>
-                    <p className={styles.cardDesc}>Select one to confirm your booking.</p>
+                    {showMockCourses && (
+                      <p className={styles.cardDescNote}>Showing nearby courses — tap a course to check availability.</p>
+                    )}
+                    {!showMockCourses && (
+                      <p className={styles.cardDesc}>Select one to confirm your booking.</p>
+                    )}
                     <div className={styles.courseList}>
                       {round.match.suggestedCourses.map(course => (
                         <button
