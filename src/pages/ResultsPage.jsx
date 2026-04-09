@@ -135,7 +135,7 @@ export default function ResultsPage() {
   const hasMatch        = round.match && round.status === 'matched'
   const organizer       = round.players.find(p => p.isOrganizer)
   // True only when real OSM courses have arrived (Phase 2 complete)
-  const hasRealCourses  = round.match?.suggestedCourses?.some(c => c.source === 'openstreetmap')
+  const hasRealCourses  = round.match?.suggestedCourses?.some(c => c.source === 'openstreetmap' || c.source === 'golfcourseapi')
   const coursesLoading  = hasMatch && !hasRealCourses
 
   return (
