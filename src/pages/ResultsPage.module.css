@@ -734,3 +734,35 @@
   padding-right: 1.25rem;
   font-style: italic;
 }
+
+/* ─── No courses found state ─────────────── */
+.noCourses {
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.noCoursesIcon {
+  font-size: 2rem;
+  opacity: 0.4;
+  margin-bottom: 0.25rem;
+}
+
+.noCoursesTitle {
+  font-family: var(--font-score);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.noCoursesSub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 340px;
+}

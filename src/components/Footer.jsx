@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import styles from './Footer.module.css'
 
-const VERSION = '2026.4.6'
+const VERSION = '2026.4.7'
 
 export default function Footer() {
   return (

@@ -2,14 +2,14 @@
  * TeeTimeQuest — Background match upgrade
  * POST /api/match  { roundId }
  *
- * Called by the browser after Phase 1 saves a quick sync match.
- * Geocodes player locations, finds the midpoint, then fetches real
- * courses — GolfCourseAPI first (if key set), Overpass OSM as fallback.
+ * Runs GCAPI and Overpass in PARALLEL so we stay within Vercel's 10s budget.
+ * Whichever returns usable courses first wins.
  *
- * Env vars required in Vercel:
- *   VITE_SUPABASE_URL      — Supabase project URL
- *   VITE_SUPABASE_ANON_KEY — Supabase anon key
- *   GOLF_COURSE_API_KEY    — from golfcourseapi.com (optional, falls back to OSM)
+ * Timeline:
+ *   0ms    — Supabase + Nominatim fire in parallel
+ *   ~1.5s  — coords ready, GCAPI + Overpass fire in parallel
+ *   ~5s    — first result wins
+ *   ~6s    — patch Supabase, done
  */
 
 export default async function handler(req, res) {
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
   const supabaseUrl     = process.env.VITE_SUPABASE_URL
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
-  const gcApiKey        = process.env.GOLF_COURSE_API_KEY  // optional
+  const gcApiKey        = process.env.GOLF_COURSE_API_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return res.status(500).json({ error: 'Supabase env vars missing' })
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    /* ── 1. Fetch round + players ─────────────────────────── */
+    /* ── 1. Supabase fetch ────────────────────────────────── */
     const [roundRes, playersRes] = await Promise.all([
       fetch(`${supabaseUrl}/rest/v1/rounds?id=eq.${roundId}&select=*`, { headers: sbHeaders }),
       fetch(`${supabaseUrl}/rest/v1/players?round_id=eq.${roundId}&select=*`, { headers: sbHeaders }),
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       isOrganizer: p.is_organizer, availability: p.availability,
     }))
 
-    /* ── 2. Geocode player locations ──────────────────────── */
+    /* ── 2. Geocode ───────────────────────────────────────── */
     const locations = [...new Set(
       normalisedPlayers.map(p => p.availability?.location).filter(Boolean)
     )]
@@ -60,8 +60,8 @@ export default async function handler(req, res) {
     const geocodeOne = async (loc) => {
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(loc)}&limit=1`
       const r = await fetch(url, {
-        headers: { 'Accept-Language': 'en', 'User-Agent': 'TeeTimeQuest/1.0 (teetimequest.com)' },
-        signal: AbortSignal.timeout(4000),
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'TeeTimeQuest/1.0' },
+        signal: AbortSignal.timeout(3500),
       })
       const data = await r.json()
       if (!data[0]) throw new Error(`Not found: ${loc}`)
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, source: 'geocode-failed' })
     }
 
-    /* ── 3. Geographic midpoint ───────────────────────────── */
+    /* ── 3. Midpoint ─────────────────────────────────────── */
     let x = 0, y = 0, z = 0
     for (const { lat, lng } of coords) {
       const la = (lat * Math.PI) / 180, lo = (lng * Math.PI) / 180
@@ -85,36 +85,58 @@ export default async function handler(req, res) {
     x /= coords.length; y /= coords.length; z /= coords.length
     const midLat = ((Math.atan2(z, Math.sqrt(x * x + y * y))) * 180) / Math.PI
     const midLng = ((Math.atan2(y, x)) * 180) / Math.PI
-    console.info(`[match-api] Midpoint: ${midLat.toFixed(4)},${midLng.toFixed(4)} from [${locations.join(', ')}]`)
+    console.info(`[match-api] Midpoint: ${midLat.toFixed(4)},${midLng.toFixed(4)} | locations: ${locations.join(' + ')}`)
 
-    /* ── 4. Fetch courses — GolfCourseAPI then OSM ────────── */
-    let courses = null
-    let courseSource = 'none'
+    /* ── 4. Fetch courses — GCAPI and Overpass IN PARALLEL ── */
+    // Both fire at the same time. We take the first that returns results.
+    // This keeps total course-fetch time to max(gcapi, overpass) not sum.
+    const coursePromises = []
 
     if (gcApiKey) {
-      courses = await fetchGolfCourseAPI(midLat, midLng, gcApiKey)
-      if (courses?.length) courseSource = 'golfcourseapi'
+      coursePromises.push(
+        fetchGolfCourseAPI(midLat, midLng, gcApiKey)
+          .then(c => c?.length ? { courses: c, source: 'golfcourseapi' } : null)
+          .catch(() => null)
+      )
     }
 
-    if (!courses?.length) {
-      const reason = gcApiKey ? 'GCAPI returned nothing — possibly rate limited or key issue' : 'No GCAPI key set'
-      console.info(`[match-api] ${reason}. Trying Overpass...`)
-      courses = await fetchOverpass(midLat, midLng)
-      if (courses?.length) courseSource = 'openstreetmap'
+    coursePromises.push(
+      fetchOverpass(midLat, midLng)
+        .then(c => c?.length ? { courses: c, source: 'openstreetmap' } : null)
+        .catch(() => null)
+    )
+
+    // Promise.any — resolves with the first non-null result
+    // Falls back to null if all fail
+    let courseResult = null
+    try {
+      courseResult = await Promise.any(
+        coursePromises.map(p => p.then(r => {
+          if (!r) throw new Error('no results')
+          return r
+        }))
+      )
+    } catch {
+      courseResult = null
     }
 
-    if (!courses?.length) {
-      console.warn('[match-api] No courses found from any source')
-      return res.status(200).json({ ok: true, source: 'no-courses' })
+    // If Promise.any didn't find anything, try checking all settled results
+    if (!courseResult) {
+      const settled = await Promise.allSettled(coursePromises)
+      for (const s of settled) {
+        if (s.status === 'fulfilled' && s.value) {
+          courseResult = s.value
+          break
+        }
+      }
     }
 
-    console.info(`[match-api] ${courses.length} courses from ${courseSource} | gcapi key set: ${!!gcApiKey}`)
+    console.info(`[match-api] Course result: ${courseResult ? courseResult.source + ' (' + courseResult.courses.length + ')' : 'none'}`)
 
-    /* ── 5. Build complete match ──────────────────────────── */
+    /* ── 5. Build match ───────────────────────────────────── */
     const dateSets = normalisedPlayers
       .filter(p => p.availability?.dates?.length)
       .map(p => new Set(p.availability.dates))
-
     if (!dateSets.length) return res.status(200).json({ ok: true, source: 'no-dates' })
 
     let commonDates = [...dateSets[0]]
@@ -150,9 +172,12 @@ export default async function handler(req, res) {
     const timeIdx = roundId.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % timeCandidates.length
     const chosenTime = timeCandidates[timeIdx]
 
-    // City for storyline — from top course address
+    // Build full match — suggestedCourses is null if nothing found
+    const courses = courseResult?.courses || null
+    const courseSource = courseResult?.source || 'none'
+
+    const topCourse = courses?.[0] || null
     let city = round.city
-    const topCourse = courses[0]
     if (topCourse?.address) {
       const parts = topCourse.address.split(',').map(s => s.trim()).filter(Boolean)
       city = parts.length >= 2 ? parts.slice(-2).join(', ') : parts[0] || city
@@ -164,7 +189,7 @@ export default async function handler(req, res) {
       date:             chosenDate,
       teeTime:          chosenTime,
       commonDatesCount: commonDates.length,
-      suggestedCourses: courses,
+      suggestedCourses: courses,   // null = no courses found, not an empty mock list
       confirmedCourse:  null,
       storyline,
       courseSource,
@@ -183,8 +208,8 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'Failed to save match' })
     }
 
-    console.info(`[match-api] ✓ round=${roundId} courses=${courses.length} source=${courseSource}`)
-    return res.status(200).json({ ok: true, source: courseSource, courses: courses.length })
+    console.info(`[match-api] ✓ Saved | round=${roundId} source=${courseSource} courses=${courses?.length ?? 0}`)
+    return res.status(200).json({ ok: true, source: courseSource, courses: courses?.length ?? 0 })
 
   } catch (err) {
     console.error('[match-api] Unexpected error:', err.message)
@@ -192,12 +217,7 @@ export default async function handler(req, res) {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   GOLF COURSE API  —  https://golfcourseapi.com
-   GET /v1/search?latitude=&longitude=&distance_km=
-   Authorization: Key YOUR_API_KEY
-═══════════════════════════════════════════════════════════════ */
-
+/* ─── GolfCourseAPI ────────────────────────────────────────── */
 async function fetchGolfCourseAPI(lat, lng, apiKey, radiusKm = 50) {
   try {
     const url = new URL('https://api.golfcourseapi.com/v1/search')
@@ -206,100 +226,68 @@ async function fetchGolfCourseAPI(lat, lng, apiKey, radiusKm = 50) {
     url.searchParams.set('distance_km', radiusKm)
 
     const res = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Key ${apiKey}`,
-        Accept:        'application/json',
-      },
-      signal: AbortSignal.timeout(8000),
+      headers: { Authorization: `Key ${apiKey}`, Accept: 'application/json' },
+      signal: AbortSignal.timeout(5000),
     })
 
     if (!res.ok) {
-      const body = await res.text().catch(() => '')
-      console.warn(`[gcapi] HTTP ${res.status} — possible rate limit or invalid key: ${body.slice(0, 200)}`)
-      // 429 = rate limited, 401/403 = bad key, 402 = plan upgrade needed
+      console.warn(`[gcapi] HTTP ${res.status}`)
       return null
     }
 
     const data = await res.json()
     const raw  = Array.isArray(data.courses) ? data.courses : []
-    console.info(`[gcapi] Raw results: ${raw.length}`)
+    console.info(`[gcapi] ${raw.length} raw results`)
     if (!raw.length) return null
 
-    const PUBLIC_TYPES   = ['public', 'semi-private', 'resort', 'municipal']
-    const PRIVATE_NAMES  = ['country club', 'yacht club', 'hunt club', 'polo club',
-                            'athletic club', 'members only', 'private club']
+    const PUBLIC_TYPES  = ['public', 'semi-private', 'resort', 'municipal']
+    const PRIVATE_NAMES = ['country club', 'yacht club', 'hunt club', 'polo club',
+                           'athletic club', 'members only', 'private club']
+    const haversine = mkHaversine()
 
-    const haversine = (la1, lo1, la2, lo2) => {
-      const R = 3958.8, dLa = ((la2-la1)*Math.PI)/180, dLo = ((lo2-lo1)*Math.PI)/180
-      const a = Math.sin(dLa/2)**2 +
-        Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2
-      return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1)
-    }
-
-    const courses = raw
+    return raw
       .filter(c => {
-        // Club type — filter private if the field exists
         if (c.club_type && !PUBLIC_TYPES.includes(c.club_type.toLowerCase())) return false
-        // Name-based fallback filter
         const lower = (c.club_name || '').toLowerCase()
         if (PRIVATE_NAMES.some(kw => lower.includes(kw))) return false
         if (lower.endsWith(' club') && !lower.includes('golf club')) return false
         return true
       })
       .map(c => {
-        const loc = c.location || {}
-
-        // Build display name
-        let name = c.club_name || 'Golf Course'
-        if (
-          c.course_name &&
-          c.course_name !== c.club_name &&
-          !c.course_name.toLowerCase().match(/^main|^championship|^course\s*\d*$/i)
-        ) {
+        const loc  = c.location || {}
+        let name   = c.club_name || 'Golf Course'
+        if (c.course_name && c.course_name !== c.club_name &&
+            !c.course_name.toLowerCase().match(/^main|^championship|^course\s*\d*$/i)) {
           name = `${c.club_name} — ${c.course_name}`
         }
-
-        const addrParts = [loc.address, loc.city, loc.state].filter(Boolean)
-
         return {
           id:             `gcapi-${c.id}`,
           name,
-          address:        addrParts.join(', ') || null,
+          address:        [loc.address, loc.city, loc.state].filter(Boolean).join(', ') || null,
           phone:          c.phone   || null,
           website:        c.website || null,
           holes:          c.num_holes || 18,
-          par:            72,          // GolfCourseAPI doesn't expose par
+          par:            72,
           access:         c.club_type || 'public',
-          rating:         null,
-          price:          null,
+          rating:         null, price: null,
           hasDrivingRange: !!c.has_driving_range,
-          distanceMi:     loc.latitude && loc.longitude
-                            ? haversine(lat, lng, loc.latitude, loc.longitude)
-                            : null,
-          lat:    loc.latitude,
-          lon:    loc.longitude,
+          distanceMi:     loc.latitude && loc.longitude ? haversine(lat, lng, loc.latitude, loc.longitude) : null,
+          lat: loc.latitude, lon: loc.longitude,
           source: 'golfcourseapi',
         }
       })
       .sort((a, b) => parseFloat(a.distanceMi || 999) - parseFloat(b.distanceMi || 999))
       .filter((c, i, arr) => arr.findIndex(x => x.name === c.name) === i)
-      .slice(0, 5)
-
-    console.info(`[gcapi] After filter: ${courses.length} public courses`)
-    return courses.length ? courses : null
-
+      .slice(0, 5) || null
   } catch (err) {
     console.warn('[gcapi] Error:', err.message)
     return null
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   OVERPASS / OPENSTREETMAP  —  fallback when no GolfCourseAPI key
-═══════════════════════════════════════════════════════════════ */
-
+/* ─── Overpass / OpenStreetMap ─────────────────────────────── */
 async function fetchOverpass(lat, lng, radiusMeters = 50000) {
-  const query = `[out:json][timeout:7];
+  const query = `[out:json][timeout:6];
 (
   node["leisure"="golf_course"](around:${radiusMeters},${lat},${lng});
   way["leisure"="golf_course"](around:${radiusMeters},${lat},${lng});
@@ -310,37 +298,36 @@ out center tags;`
   const PRIVATE_KEYWORDS = ['country club','yacht club','hunt club','polo club',
                              'athletic club','members only','private club']
   const PRIVATE_ACCESS   = ['private','members','permissive','no','restricted']
+  const haversine        = mkHaversine()
 
-  const haversine = (la1, lo1, la2, lo2) => {
-    const R = 3958.8, dLa = ((la2-la1)*Math.PI)/180, dLo = ((lo2-lo1)*Math.PI)/180
-    const a = Math.sin(dLa/2)**2 +
-      Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2
-    return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1)
+  // Try both endpoints simultaneously — take whichever responds first
+  const tryEndpoint = async (endpoint) => {
+    const r = await fetch(endpoint, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body:    `data=${encodeURIComponent(query)}`,
+      signal:  AbortSignal.timeout(7000),
+    })
+    if (!r.ok) throw new Error(`HTTP ${r.status}`)
+    const data = await r.json()
+    const elements = data.elements || []
+    if (!elements.length) throw new Error('empty')
+    console.info(`[overpass] ${elements.length} elements from ${endpoint}`)
+    return elements
   }
 
   let elements = []
-  for (const endpoint of [
-    'https://overpass-api.de/api/interpreter',
-    'https://overpass.kumi.systems/api/interpreter',
-  ]) {
-    try {
-      const r = await fetch(endpoint, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body:    `data=${encodeURIComponent(query)}`,
-        signal:  AbortSignal.timeout(6000),
-      })
-      if (!r.ok) continue
-      const data = await r.json()
-      elements = data.elements || []
-      console.info(`[overpass] ${elements.length} elements from ${endpoint}`)
-      break
-    } catch { continue }
+  try {
+    elements = await Promise.any([
+      tryEndpoint('https://overpass-api.de/api/interpreter'),
+      tryEndpoint('https://overpass.kumi.systems/api/interpreter'),
+    ])
+  } catch (err) {
+    console.warn('[overpass] All endpoints failed:', err.message)
+    return null
   }
 
-  if (!elements.length) return null
-
-  const courses = elements
+  return elements
     .map(el => {
       const tags = el.tags || {}
       const elLat = el.lat ?? el.center?.lat
@@ -377,15 +364,19 @@ out center tags;`
     })
     .sort((a, b) => parseFloat(a.distanceMi || 999) - parseFloat(b.distanceMi || 999))
     .filter((c, i, arr) => arr.findIndex(x => x.name === c.name) === i)
-    .slice(0, 5)
-
-  return courses.length ? courses : null
+    .slice(0, 5) || null
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STORYLINE GENERATOR
-═══════════════════════════════════════════════════════════════ */
+/* ─── Shared haversine ─────────────────────────────────────── */
+function mkHaversine() {
+  return (la1, lo1, la2, lo2) => {
+    const R = 3958.8, dLa = ((la2-la1)*Math.PI)/180, dLo = ((lo2-lo1)*Math.PI)/180
+    const a = Math.sin(dLa/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2
+    return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1)
+  }
+}
 
+/* ─── Storyline ────────────────────────────────────────────── */
 function buildStoryline(roundId, players, date, teeTime, city, courseName) {
   const firstNames = players.map(p => (p.name || '').split(' ')[0]).filter(Boolean)
   let names
@@ -400,14 +391,9 @@ function buildStoryline(roundId, players, date, teeTime, city, courseName) {
   } catch {}
 
   const OPENERS = [
-    "The crew is locked in.",
-    "It's official — the round is on.",
-    "Mark the calendar.",
-    "Game day is coming.",
-    "The fairways await.",
-    "Clubs out, chaos incoming.",
-    "The group chat can finally rest.",
-    "Someone's going home with a story.",
+    "The crew is locked in.", "It's official — the round is on.", "Mark the calendar.",
+    "Game day is coming.", "The fairways await.", "Clubs out, chaos incoming.",
+    "The group chat can finally rest.", "Someone's going home with a story.",
   ]
   const FORMATS = [
     ({ names, city, teeTime, course }) =>
@@ -423,7 +409,6 @@ function buildStoryline(roundId, players, date, teeTime, city, courseName) {
   ]
 
   const seed   = roundId.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
-  const opener = OPENERS[seed % OPENERS.length]
-  const format = FORMATS[(seed + 3) % FORMATS.length]
-  return opener + ' ' + format({ names, city, date: dateStr, teeTime, course: courseName || null })
+  return OPENERS[seed % OPENERS.length] + ' ' +
+    FORMATS[(seed + 3) % FORMATS.length]({ names, city, date: dateStr, teeTime, course: courseName || null })
 }

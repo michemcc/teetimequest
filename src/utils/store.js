@@ -293,11 +293,11 @@ function computeMatchSync(round) {
   const candidates = teeTimeMap[topPref] || ['8:30 AM']
   const teeTime = candidates[Math.floor(Math.random() * candidates.length)]
 
-  const shuffled = [...MOCK_COURSES].sort(() => (round.id.charCodeAt(0) % 2 === 0 ? 1 : -1))
   const storyline = generateStoryline(round, common[0], teeTime, null)
 
+  // suggestedCourses is null until Phase 2 (/api/match) runs and finds real courses
   return { date: common[0], teeTime, commonDatesCount: common.length,
-           suggestedCourses: shuffled.slice(0,3), confirmedCourse: null, storyline }
+           suggestedCourses: null, confirmedCourse: null, storyline }
 }
 
 /* ── Shape normaliser ── DB uses snake_case; app expects camelCase ── */

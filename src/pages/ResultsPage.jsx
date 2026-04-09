@@ -129,7 +129,7 @@ export default function ResultsPage() {
     }
     // Start 18s timer — if real courses haven't arrived, fall back to mock
     coursesTimeoutRef.current = setTimeout(() => {
-      console.warn('[courses] Timed out — showing mock courses')
+      console.warn('[courses] Timed out waiting for real courses')
       setCoursesTimedOut(true)
     }, 18000)
     return () => {
@@ -203,9 +203,11 @@ export default function ResultsPage() {
   const organizer       = round.players.find(p => p.isOrganizer)
   // True only when real OSM courses have arrived (Phase 2 complete)
   const hasRealCourses  = round.match?.suggestedCourses?.some(c => c.source === 'openstreetmap' || c.source === 'golfcourseapi')
-  const coursesLoading  = hasMatch && !hasRealCourses && !coursesTimedOut
-  // When timed out, show mock courses with a note
-  const showMockCourses = hasMatch && !hasRealCourses && coursesTimedOut
+  // null = Phase 2 ran but found no courses. undefined/missing = not yet run.
+  const phase2Ran       = hasMatch && round.match?.courseSource !== undefined
+  const noCourseFound   = hasMatch && !hasRealCourses && (round.match?.suggestedCourses === null || coursesTimedOut)
+  const coursesLoading  = hasMatch && !hasRealCourses && !noCourseFound
+  const showMockCourses = false  // never show mock data
 
   return (
     <div className={styles.page}>
@@ -301,15 +303,19 @@ export default function ResultsPage() {
                   </div>
                 )}
 
-                {/* Real courses — Phase 2 complete, or timed out showing mock */}
-                {(hasRealCourses || showMockCourses) && (
+                {/* No courses found after Phase 2 ran */}
+                {noCourseFound && (
+                  <div className={styles.noCourses}>
+                    <div className={styles.noCoursesIcon}>⛳</div>
+                    <p className={styles.noCoursesTitle}>No public courses found</p>
+                    <p className={styles.noCoursesSub}>We couldn't find public courses between your players right now. Try calling local clubs directly or check back soon.</p>
+                  </div>
+                )}
+
+                {/* Real courses — Phase 2 complete */}
+                {hasRealCourses && (
                   <>
-                    {showMockCourses && (
-                      <p className={styles.cardDescNote}>Showing nearby courses — tap a course to check availability.</p>
-                    )}
-                    {!showMockCourses && (
-                      <p className={styles.cardDesc}>Select one to confirm your booking.</p>
-                    )}
+                    <p className={styles.cardDesc}>Select one to confirm your booking.</p>
                     <div className={styles.courseList}>
                       {round.match.suggestedCourses.map(course => (
                         <button
