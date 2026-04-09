@@ -229,7 +229,9 @@ export default function ResultsPage() {
           )}
           <p className={styles.subtitle}>
             {hasMatch
-              ? `Best date and tee time locked in. ${round.match.suggestedCourses?.length || 0} courses nearby.`
+              ? hasRealCourses
+                ? `Best date and tee time locked in. ${round.match.suggestedCourses?.length || 0} courses found.`
+                : 'Best date and tee time locked in. Finding courses near your group…'
               : `${respondedCount} of ${round.players.length} players have responded. Copy and share the links below!`}
           </p>
         </div>
@@ -263,10 +265,12 @@ export default function ResultsPage() {
                     <span className={styles.matchMetaIcon}>👥</span>
                     <span>{round.players.length} players</span>
                   </div>
-                  {(()=> {
+                  {hasRealCourses && (()=> {
                     const sc = selectedCourse
                       ? round.match.suggestedCourses?.find(c => c.id === selectedCourse)
                       : round.match.suggestedCourses?.[0]
+                    // Only show location for real courses (not mock data)
+                    if (!sc?.source || sc.source === 'mock') return null
                     const city = sc?.address
                       ? sc.address.split(',').map(s=>s.trim()).filter(Boolean).slice(-2).join(', ')
                       : null

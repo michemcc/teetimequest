@@ -97,7 +97,8 @@ export default async function handler(req, res) {
     }
 
     if (!courses?.length) {
-      console.info('[match-api] Falling back to OSM Overpass...')
+      const reason = gcApiKey ? 'GCAPI returned nothing — possibly rate limited or key issue' : 'No GCAPI key set'
+      console.info(`[match-api] ${reason}. Trying Overpass...`)
       courses = await fetchOverpass(midLat, midLng)
       if (courses?.length) courseSource = 'openstreetmap'
     }
@@ -107,7 +108,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, source: 'no-courses' })
     }
 
-    console.info(`[match-api] ${courses.length} courses from ${courseSource}`)
+    console.info(`[match-api] ${courses.length} courses from ${courseSource} | gcapi key set: ${!!gcApiKey}`)
 
     /* ── 5. Build complete match ──────────────────────────── */
     const dateSets = normalisedPlayers
@@ -214,7 +215,8 @@ async function fetchGolfCourseAPI(lat, lng, apiKey, radiusKm = 50) {
 
     if (!res.ok) {
       const body = await res.text().catch(() => '')
-      console.warn(`[gcapi] HTTP ${res.status}: ${body.slice(0, 200)}`)
+      console.warn(`[gcapi] HTTP ${res.status} — possible rate limit or invalid key: ${body.slice(0, 200)}`)
+      // 429 = rate limited, 401/403 = bad key, 402 = plan upgrade needed
       return null
     }
 
