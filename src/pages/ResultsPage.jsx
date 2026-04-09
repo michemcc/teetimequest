@@ -62,7 +62,7 @@ export default function ResultsPage() {
         `/api/teetimes?courseId=${encodeURIComponent(courseId)}&date=${date}&players=${players}`
       )
       const data = await res.json()
-      console.info('[teetimes] response:', data.source, '| slots:', data.slots?.length, data.slots?.[0])
+      console.info('[teetimes] response:', data.source, '| slots:', data.slots?.length, '| debug:', data._debug)
       setTeeSlots(data.slots || [])
       setTeeSlotsSource(data.source || 'unknown')
     } catch (err) {
@@ -184,7 +184,7 @@ export default function ResultsPage() {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerMeta}>
-            <span className={styles.headerChip}>Round · {round.city}</span>
+            <span className={styles.headerChip}>Round</span>
             {hasMatch && <span className={styles.headerChipGreen}>Match found</span>}
           </div>
           <h1 className={`${styles.title} ${hasMatch ? styles.titleMatched : ''}`}>
@@ -193,7 +193,7 @@ export default function ResultsPage() {
           {hasMatch && (
             <div className={styles.headerMatchBadge}>
               <span className={styles.headerMatchPulse}/>
-              Match found · {round.city}
+              Match found
             </div>
           )}
           <p className={styles.subtitle}>
@@ -232,10 +232,20 @@ export default function ResultsPage() {
                     <span className={styles.matchMetaIcon}>👥</span>
                     <span>{round.players.length} players</span>
                   </div>
-                  <div className={styles.matchMetaItem}>
-                    <span className={styles.matchMetaIcon}>📍</span>
-                    <span>{round.city}</span>
-                  </div>
+                  {(()=> {
+                    const sc = selectedCourse
+                      ? round.match.suggestedCourses?.find(c => c.id === selectedCourse)
+                      : round.match.suggestedCourses?.[0]
+                    const city = sc?.address
+                      ? sc.address.split(',').map(s=>s.trim()).filter(Boolean).slice(-2).join(', ')
+                      : null
+                    return city ? (
+                      <div className={styles.matchMetaItem}>
+                        <span className={styles.matchMetaIcon}>📍</span>
+                        <span>{city}</span>
+                      </div>
+                    ) : null
+                  })()}
                 </div>
               </div>
             )}

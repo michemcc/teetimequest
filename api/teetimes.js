@@ -55,13 +55,13 @@ export default async function handler(req, res) {
 
     if (apiRes.status === 404) {
       console.info(`[teetimes] 404 — course ${numericId} has no tee time data`)
-      return res.status(200).json({ slots: [], source: 'no-teetimes' })
+      return res.status(200).json({ slots: [], source: 'no-teetimes', _debug: { status: 404, courseId: numericId } })
     }
 
     if (!apiRes.ok) {
       const body = await apiRes.text().catch(() => '')
       console.warn(`[teetimes] HTTP ${apiRes.status}: ${body.slice(0, 300)}`)
-      return res.status(200).json({ slots: [], source: 'api-error', status: apiRes.status })
+      return res.status(200).json({ slots: [], source: 'api-error', status: apiRes.status, _debug: { body: body.slice(0, 500) } })
     }
 
     const data = await apiRes.json()
@@ -133,7 +133,16 @@ export default async function handler(req, res) {
     console.info(`[teetimes] Returning ${slots.length} slots for course ${numericId} on ${date}`)
 
     res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=60')
-    return res.status(200).json({ slots, source: 'golfcourseapi' })
+    return res.status(200).json({
+      slots,
+      source: 'golfcourseapi',
+      // Include debug info so browser console shows exactly what came back
+      _debug: {
+        rawCount: rawArray.length,
+        firstRaw: rawArray[0] || null,
+        responseKeys: Object.keys(data),
+      }
+    })
 
   } catch (err) {
     console.error('[teetimes] Error:', err.message)
