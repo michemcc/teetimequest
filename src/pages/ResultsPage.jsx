@@ -112,9 +112,14 @@ export default function ResultsPage() {
 
   /* ── Courses skeleton timeout — don't spin forever ── */
   useEffect(() => {
-    if (!hasMatch) return
-    if (hasRealCourses) {
-      // Real courses arrived — clear any pending timeout
+    // Compute safely from round (may be null during loading)
+    const matched    = !!(round?.match && round?.status === 'matched')
+    const realCourses = !!(round?.match?.suggestedCourses?.some(
+      c => c.source === 'openstreetmap' || c.source === 'golfcourseapi'
+    ))
+
+    if (!matched) return
+    if (realCourses) {
       if (coursesTimeoutRef.current) {
         clearTimeout(coursesTimeoutRef.current)
         coursesTimeoutRef.current = null
@@ -122,15 +127,15 @@ export default function ResultsPage() {
       setCoursesTimedOut(false)
       return
     }
-    // Start 18s timer — if real courses haven't arrived by then, show mock
+    // Start 18s timer — if real courses haven't arrived, fall back to mock
     coursesTimeoutRef.current = setTimeout(() => {
-      console.warn('[courses] Timed out waiting for real courses — showing mock data')
+      console.warn('[courses] Timed out — showing mock courses')
       setCoursesTimedOut(true)
     }, 18000)
     return () => {
       if (coursesTimeoutRef.current) clearTimeout(coursesTimeoutRef.current)
     }
-  }, [hasMatch, hasRealCourses])
+  }, [round?.status, round?.match])
 
   /* ── Polling fallback — ref-based so cleanup is always reliable ── */
   const pollRef = useRef(null)
