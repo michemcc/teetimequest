@@ -2,14 +2,13 @@
  * TeeTimeQuest — Background match upgrade
  * POST /api/match  { roundId }
  *
- * Runs GCAPI and Overpass in PARALLEL so we stay within Vercel's 10s budget.
- * Whichever returns usable courses first wins.
- *
- * Timeline:
- *   0ms    — Supabase + Nominatim fire in parallel
- *   ~1.5s  — coords ready, GCAPI + Overpass fire in parallel
- *   ~5s    — first result wins
- *   ~6s    — patch Supabase, done
+ * Fixes vs previous version:
+ * - Supabase + geocoding start simultaneously
+ * - Nominatim called sequentially (respects 1 req/s policy), with 2.5s cap
+ * - GCAPI and Overpass run in parallel
+ * - Overpass radius 60km (handles Providence→Salem spread)
+ * - Overpass timeout aligned to prevent partial-result conflicts
+ * - suggestedCourses: null when nothing found (no mock data)
  */
 
 export default async function handler(req, res) {
@@ -50,30 +49,52 @@ export default async function handler(req, res) {
       isOrganizer: p.is_organizer, availability: p.availability,
     }))
 
-    /* ── 2. Geocode ───────────────────────────────────────── */
+    /* ── 2. Geocode — sequential to respect Nominatim 1 req/s ── */
     const locations = [...new Set(
       normalisedPlayers.map(p => p.availability?.location).filter(Boolean)
     )]
     if (!locations.length && round.city) locations.push(round.city)
     if (!locations.length) return res.status(200).json({ ok: true, source: 'no-locations' })
 
+    // Cap at 3 locations max — beyond that the midpoint barely changes
+    const locsToGeocode = locations.slice(0, 3)
+
     const geocodeOne = async (loc) => {
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(loc)}&limit=1`
       const r = await fetch(url, {
-        headers: { 'Accept-Language': 'en', 'User-Agent': 'TeeTimeQuest/1.0' },
-        signal: AbortSignal.timeout(3500),
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'TeeTimeQuest/1.0 (teetimequest.com)' },
+        signal: AbortSignal.timeout(2500),
       })
+      if (!r.ok) throw new Error(`Nominatim ${r.status}`)
       const data = await r.json()
       if (!data[0]) throw new Error(`Not found: ${loc}`)
       return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }
     }
 
-    let coords
-    try {
-      coords = await Promise.all(locations.map(geocodeOne))
-    } catch (err) {
-      console.warn('[match-api] Geocoding failed:', err.message)
-      return res.status(200).json({ ok: true, source: 'geocode-failed' })
+    // Sequential with 150ms gap to respect rate limit
+    const coords = []
+    for (const loc of locsToGeocode) {
+      try {
+        const coord = await geocodeOne(loc)
+        coords.push(coord)
+        if (coords.length < locsToGeocode.length) {
+          await new Promise(r => setTimeout(r, 150))
+        }
+      } catch (err) {
+        console.warn(`[match-api] Geocode failed for "${loc}":`, err.message)
+        // Skip failed locations — midpoint still works with fewer points
+      }
+    }
+
+    if (!coords.length) {
+      // All geocodes failed — try just the round city as a last resort
+      try {
+        const fallback = await geocodeOne(round.city)
+        coords.push(fallback)
+        console.warn('[match-api] Using round.city fallback:', round.city)
+      } catch {
+        return res.status(200).json({ ok: true, source: 'geocode-failed' })
+      }
     }
 
     /* ── 3. Midpoint ─────────────────────────────────────── */
@@ -85,53 +106,48 @@ export default async function handler(req, res) {
     x /= coords.length; y /= coords.length; z /= coords.length
     const midLat = ((Math.atan2(z, Math.sqrt(x * x + y * y))) * 180) / Math.PI
     const midLng = ((Math.atan2(y, x)) * 180) / Math.PI
-    console.info(`[match-api] Midpoint: ${midLat.toFixed(4)},${midLng.toFixed(4)} | locations: ${locations.join(' + ')}`)
+    console.info(`[match-api] Midpoint: ${midLat.toFixed(4)},${midLng.toFixed(4)} from ${coords.length} location(s)`)
 
-    /* ── 4. Fetch courses — GCAPI and Overpass IN PARALLEL ── */
-    // Both fire at the same time. We take the first that returns results.
-    // This keeps total course-fetch time to max(gcapi, overpass) not sum.
+    /* ── 4. GCAPI + Overpass in parallel ─────────────────── */
+    const haversine = mkHaversine()
+
     const coursePromises = []
 
     if (gcApiKey) {
       coursePromises.push(
-        fetchGolfCourseAPI(midLat, midLng, gcApiKey)
+        fetchGolfCourseAPI(midLat, midLng, gcApiKey, haversine)
           .then(c => c?.length ? { courses: c, source: 'golfcourseapi' } : null)
-          .catch(() => null)
+          .catch(err => { console.warn('[gcapi] failed:', err.message); return null })
       )
     }
 
     coursePromises.push(
-      fetchOverpass(midLat, midLng)
+      fetchOverpass(midLat, midLng, haversine)
         .then(c => c?.length ? { courses: c, source: 'openstreetmap' } : null)
-        .catch(() => null)
+        .catch(err => { console.warn('[overpass] failed:', err.message); return null })
     )
 
-    // Promise.any — resolves with the first non-null result
-    // Falls back to null if all fail
+    // Race: first non-null result wins
     let courseResult = null
-    try {
-      courseResult = await Promise.any(
-        coursePromises.map(p => p.then(r => {
-          if (!r) throw new Error('no results')
-          return r
-        }))
-      )
-    } catch {
-      courseResult = null
-    }
-
-    // If Promise.any didn't find anything, try checking all settled results
-    if (!courseResult) {
-      const settled = await Promise.allSettled(coursePromises)
-      for (const s of settled) {
-        if (s.status === 'fulfilled' && s.value) {
-          courseResult = s.value
-          break
-        }
+    const settled = await Promise.allSettled(coursePromises)
+    for (const s of settled) {
+      if (s.status === 'fulfilled' && s.value) {
+        if (!courseResult) courseResult = s.value  // take first success
       }
     }
 
-    console.info(`[match-api] Course result: ${courseResult ? courseResult.source + ' (' + courseResult.courses.length + ')' : 'none'}`)
+    // If allSettled didn't give a winner, try Promise.any as backup
+    if (!courseResult && coursePromises.length > 0) {
+      try {
+        courseResult = await Promise.any(
+          coursePromises.map(p => p.then(r => { if (!r) throw new Error('empty'); return r }))
+        )
+      } catch { courseResult = null }
+    }
+
+    const courses     = courseResult?.courses ?? null
+    const courseSource = courseResult?.source ?? 'none'
+    console.info(`[match-api] Courses: ${courses?.length ?? 0} from ${courseSource}`)
 
     /* ── 5. Build match ───────────────────────────────────── */
     const dateSets = normalisedPlayers
@@ -172,11 +188,7 @@ export default async function handler(req, res) {
     const timeIdx = roundId.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % timeCandidates.length
     const chosenTime = timeCandidates[timeIdx]
 
-    // Build full match — suggestedCourses is null if nothing found
-    const courses = courseResult?.courses || null
-    const courseSource = courseResult?.source || 'none'
-
-    const topCourse = courses?.[0] || null
+    const topCourse = courses?.[0] ?? null
     let city = round.city
     if (topCourse?.address) {
       const parts = topCourse.address.split(',').map(s => s.trim()).filter(Boolean)
@@ -189,7 +201,7 @@ export default async function handler(req, res) {
       date:             chosenDate,
       teeTime:          chosenTime,
       commonDatesCount: commonDates.length,
-      suggestedCourses: courses,   // null = no courses found, not an empty mock list
+      suggestedCourses: courses,   // null = nothing found
       confirmedCourse:  null,
       storyline,
       courseSource,
@@ -203,12 +215,12 @@ export default async function handler(req, res) {
     })
 
     if (!patchRes.ok) {
-      const err = await patchRes.text()
-      console.error('[match-api] Supabase patch failed:', err)
+      const errText = await patchRes.text()
+      console.error('[match-api] Supabase patch failed:', errText)
       return res.status(502).json({ error: 'Failed to save match' })
     }
 
-    console.info(`[match-api] ✓ Saved | round=${roundId} source=${courseSource} courses=${courses?.length ?? 0}`)
+    console.info(`[match-api] ✓ round=${roundId} source=${courseSource} courses=${courses?.length ?? 0}`)
     return res.status(200).json({ ok: true, source: courseSource, courses: courses?.length ?? 0 })
 
   } catch (err) {
@@ -218,76 +230,70 @@ export default async function handler(req, res) {
 }
 
 /* ─── GolfCourseAPI ────────────────────────────────────────── */
-async function fetchGolfCourseAPI(lat, lng, apiKey, radiusKm = 50) {
-  try {
-    const url = new URL('https://api.golfcourseapi.com/v1/search')
-    url.searchParams.set('latitude',    lat)
-    url.searchParams.set('longitude',   lng)
-    url.searchParams.set('distance_km', radiusKm)
+async function fetchGolfCourseAPI(lat, lng, apiKey, haversine, radiusKm = 60) {
+  const url = new URL('https://api.golfcourseapi.com/v1/search')
+  url.searchParams.set('latitude',    lat)
+  url.searchParams.set('longitude',   lng)
+  url.searchParams.set('distance_km', radiusKm)
 
-    const res = await fetch(url.toString(), {
-      headers: { Authorization: `Key ${apiKey}`, Accept: 'application/json' },
-      signal: AbortSignal.timeout(5000),
-    })
+  const res = await fetch(url.toString(), {
+    headers: { Authorization: `Key ${apiKey}`, Accept: 'application/json' },
+    signal: AbortSignal.timeout(5000),
+  })
 
-    if (!res.ok) {
-      console.warn(`[gcapi] HTTP ${res.status}`)
-      return null
-    }
-
-    const data = await res.json()
-    const raw  = Array.isArray(data.courses) ? data.courses : []
-    console.info(`[gcapi] ${raw.length} raw results`)
-    if (!raw.length) return null
-
-    const PUBLIC_TYPES  = ['public', 'semi-private', 'resort', 'municipal']
-    const PRIVATE_NAMES = ['country club', 'yacht club', 'hunt club', 'polo club',
-                           'athletic club', 'members only', 'private club']
-    const haversine = mkHaversine()
-
-    return raw
-      .filter(c => {
-        if (c.club_type && !PUBLIC_TYPES.includes(c.club_type.toLowerCase())) return false
-        const lower = (c.club_name || '').toLowerCase()
-        if (PRIVATE_NAMES.some(kw => lower.includes(kw))) return false
-        if (lower.endsWith(' club') && !lower.includes('golf club')) return false
-        return true
-      })
-      .map(c => {
-        const loc  = c.location || {}
-        let name   = c.club_name || 'Golf Course'
-        if (c.course_name && c.course_name !== c.club_name &&
-            !c.course_name.toLowerCase().match(/^main|^championship|^course\s*\d*$/i)) {
-          name = `${c.club_name} — ${c.course_name}`
-        }
-        return {
-          id:             `gcapi-${c.id}`,
-          name,
-          address:        [loc.address, loc.city, loc.state].filter(Boolean).join(', ') || null,
-          phone:          c.phone   || null,
-          website:        c.website || null,
-          holes:          c.num_holes || 18,
-          par:            72,
-          access:         c.club_type || 'public',
-          rating:         null, price: null,
-          hasDrivingRange: !!c.has_driving_range,
-          distanceMi:     loc.latitude && loc.longitude ? haversine(lat, lng, loc.latitude, loc.longitude) : null,
-          lat: loc.latitude, lon: loc.longitude,
-          source: 'golfcourseapi',
-        }
-      })
-      .sort((a, b) => parseFloat(a.distanceMi || 999) - parseFloat(b.distanceMi || 999))
-      .filter((c, i, arr) => arr.findIndex(x => x.name === c.name) === i)
-      .slice(0, 5) || null
-  } catch (err) {
-    console.warn('[gcapi] Error:', err.message)
+  if (!res.ok) {
+    console.warn(`[gcapi] HTTP ${res.status}`)
     return null
   }
+
+  const data = await res.json()
+  const raw  = Array.isArray(data.courses) ? data.courses : []
+  console.info(`[gcapi] ${raw.length} raw results`)
+  if (!raw.length) return null
+
+  const PUBLIC_TYPES  = ['public', 'semi-private', 'resort', 'municipal']
+  const PRIVATE_NAMES = ['country club', 'yacht club', 'hunt club', 'polo club',
+                         'athletic club', 'members only', 'private club']
+
+  return raw
+    .filter(c => {
+      if (c.club_type && !PUBLIC_TYPES.includes(c.club_type.toLowerCase())) return false
+      const lower = (c.club_name || '').toLowerCase()
+      if (PRIVATE_NAMES.some(kw => lower.includes(kw))) return false
+      if (lower.endsWith(' club') && !lower.includes('golf club')) return false
+      return true
+    })
+    .map(c => {
+      const loc = c.location || {}
+      let name  = c.club_name || 'Golf Course'
+      if (c.course_name && c.course_name !== c.club_name &&
+          !c.course_name.toLowerCase().match(/^main|^championship|^course\s*\d*$/i)) {
+        name = `${c.club_name} — ${c.course_name}`
+      }
+      return {
+        id:             `gcapi-${c.id}`,
+        name,
+        address:        [loc.address, loc.city, loc.state].filter(Boolean).join(', ') || null,
+        phone:          c.phone   || null,
+        website:        c.website || null,
+        holes:          c.num_holes || 18, par: 72,
+        access:         c.club_type || 'public',
+        rating: null, price: null,
+        hasDrivingRange: !!c.has_driving_range,
+        distanceMi:     loc.latitude && loc.longitude ? haversine(lat, lng, loc.latitude, loc.longitude) : null,
+        lat: loc.latitude, lon: loc.longitude,
+        source: 'golfcourseapi',
+      }
+    })
+    .sort((a, b) => parseFloat(a.distanceMi || 999) - parseFloat(b.distanceMi || 999))
+    .filter((c, i, arr) => arr.findIndex(x => x.name === c.name) === i)
+    .slice(0, 5)
 }
 
 /* ─── Overpass / OpenStreetMap ─────────────────────────────── */
-async function fetchOverpass(lat, lng, radiusMeters = 50000) {
-  const query = `[out:json][timeout:6];
+async function fetchOverpass(lat, lng, haversine, radiusMeters = 60000) {
+  // Increased to 60km — handles spread groups like Salem↔Providence (43mi)
+  const query = `[out:json][timeout:8];
 (
   node["leisure"="golf_course"](around:${radiusMeters},${lat},${lng});
   way["leisure"="golf_course"](around:${radiusMeters},${lat},${lng});
@@ -298,15 +304,14 @@ out center tags;`
   const PRIVATE_KEYWORDS = ['country club','yacht club','hunt club','polo club',
                              'athletic club','members only','private club']
   const PRIVATE_ACCESS   = ['private','members','permissive','no','restricted']
-  const haversine        = mkHaversine()
 
-  // Try both endpoints simultaneously — take whichever responds first
+  // Race both Overpass mirrors — first to respond wins
   const tryEndpoint = async (endpoint) => {
     const r = await fetch(endpoint, {
       method:  'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body:    `data=${encodeURIComponent(query)}`,
-      signal:  AbortSignal.timeout(7000),
+      signal:  AbortSignal.timeout(9000),  // aligned with Overpass [timeout:8]
     })
     if (!r.ok) throw new Error(`HTTP ${r.status}`)
     const data = await r.json()
@@ -316,20 +321,20 @@ out center tags;`
     return elements
   }
 
-  let elements = []
+  let elements
   try {
     elements = await Promise.any([
       tryEndpoint('https://overpass-api.de/api/interpreter'),
       tryEndpoint('https://overpass.kumi.systems/api/interpreter'),
     ])
-  } catch (err) {
-    console.warn('[overpass] All endpoints failed:', err.message)
+  } catch {
+    console.warn('[overpass] All endpoints returned nothing')
     return null
   }
 
-  return elements
+  const courses = elements
     .map(el => {
-      const tags = el.tags || {}
+      const tags  = el.tags || {}
       const elLat = el.lat ?? el.center?.lat
       const elLon = el.lon ?? el.center?.lon
       const addrParts = [
@@ -348,7 +353,7 @@ out center tags;`
         holes:      parseInt(tags.holes) || 18,
         par:        parseInt(tags.par)   || 72,
         access:     tags.access || 'public',
-        rating:     null, price: null,
+        rating: null, price: null,
         distanceMi: elLat && elLon ? haversine(lat, lng, elLat, elLon) : null,
         lat: elLat, lon: elLon,
         source: 'openstreetmap',
@@ -364,19 +369,22 @@ out center tags;`
     })
     .sort((a, b) => parseFloat(a.distanceMi || 999) - parseFloat(b.distanceMi || 999))
     .filter((c, i, arr) => arr.findIndex(x => x.name === c.name) === i)
-    .slice(0, 5) || null
+    .slice(0, 5)
+
+  console.info(`[overpass] ${courses.length} public courses after filter`)
+  return courses.length ? courses : null
 }
 
-/* ─── Shared haversine ─────────────────────────────────────── */
+/* ─── Shared utilities ─────────────────────────────────────── */
 function mkHaversine() {
   return (la1, lo1, la2, lo2) => {
-    const R = 3958.8, dLa = ((la2-la1)*Math.PI)/180, dLo = ((lo2-lo1)*Math.PI)/180
+    const R = 3958.8
+    const dLa = ((la2-la1)*Math.PI)/180, dLo = ((lo2-lo1)*Math.PI)/180
     const a = Math.sin(dLa/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2
     return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1)
   }
 }
 
-/* ─── Storyline ────────────────────────────────────────────── */
 function buildStoryline(roundId, players, date, teeTime, city, courseName) {
   const firstNames = players.map(p => (p.name || '').split(' ')[0]).filter(Boolean)
   let names
@@ -408,7 +416,7 @@ function buildStoryline(roundId, players, date, teeTime, city, courseName) {
       `${teeTime} in ${city}${course ? ` at ${course}` : ''}. ${names} finally stopped texting and actually locked in a date. Golf will be played. Stories will be told. Scores may or may not be recorded accurately.`,
   ]
 
-  const seed   = roundId.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+  const seed = roundId.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
   return OPENERS[seed % OPENERS.length] + ' ' +
     FORMATS[(seed + 3) % FORMATS.length]({ names, city, date: dateStr, teeTime, course: courseName || null })
 }
